@@ -1,0 +1,348 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   SECURITY PRINTING
+   ==========================================================================
+   The visual language of this system is the one the world already uses for
+   documents that must be checkable by a stranger: banknotes, share
+   certificates, bonded warehouse receipts. Intaglio green on rag paper, a
+   guilloché rosette, a counterfoil down the left edge, a perforated tear line.
+
+   That is not decoration chosen for mood. A signed receipt IS a certificate --
+   an instrument whose only value is that a third party can verify it without
+   trusting the issuer -- and five centuries of security printing is the design
+   tradition for exactly that problem. A dark neon dashboard would say
+   "blockchain product"; the specification (section 78) explicitly forbids that
+   and asks for trust infrastructure. This is what trust infrastructure has
+   always looked like.
+
+   The one place boldness is spent: the rosette. See ui/rosette.tsx -- its
+   geometry is derived from the receipt's own payload hash, so every receipt
+   engraves differently and a tampered receipt engraves visibly wrong.
+   ========================================================================== */
+
+@theme {
+  --color-rag: #f4f1e6;
+  --color-rag-deep: #ebe6d6;
+  --color-rag-shadow: #ddd6c0;
+
+  --color-intaglio: #14352a;
+  --color-intaglio-mid: #2f6b52;
+  --color-intaglio-soft: #5f8f78;
+  --color-intaglio-faint: #94ab9e;
+
+  --color-vermilion: #a8321c;
+  --color-vermilion-soft: #d9694f;
+  --color-ochre: #8a6a1f;
+  --color-indigo-stamp: #2b3f6b;
+
+  --font-plate: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --font-ledger: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-rag);
+  color: var(--color-intaglio);
+  font-family: var(--font-plate);
+  font-size: 15px;
+  line-height: 1.55;
+  /* The safety tint. Two very fine crossing rules at an angle, the way a
+     cheque background is printed -- visible on a screen only as texture, and
+     the thing that makes flat colour read as paper rather than as a div. */
+  background-image:
+    repeating-linear-gradient(
+      58deg,
+      color-mix(in oklab, var(--color-intaglio) 4%, transparent) 0 1px,
+      transparent 1px 7px
+    ),
+    repeating-linear-gradient(
+      -58deg,
+      color-mix(in oklab, var(--color-intaglio) 3%, transparent) 0 1px,
+      transparent 1px 9px
+    );
+}
+
+/* --------------------------------------------------------------------------
+   The spine: navigation as the header rule of a printed document.
+   -------------------------------------------------------------------------- */
+
+.spine {
+  border-bottom: 3px double var(--color-intaglio);
+  background: color-mix(in oklab, var(--color-rag) 92%, var(--color-intaglio) 8%);
+}
+
+.spine-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 1.35rem;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 0.55rem 1.5rem;
+}
+
+.spine-link {
+  font-family: var(--font-ledger);
+  font-size: 0.6875rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-intaglio-soft);
+  padding-bottom: 2px;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 140ms ease;
+}
+
+.spine-link:hover {
+  color: var(--color-intaglio);
+}
+
+.spine-link[aria-current="page"] {
+  color: var(--color-intaglio);
+  border-bottom-color: var(--color-vermilion);
+}
+
+/* --------------------------------------------------------------------------
+   Certificates. Every receipt, every panel, is a printed instrument.
+   -------------------------------------------------------------------------- */
+
+.plate {
+  position: relative;
+  background: color-mix(in oklab, var(--color-rag) 96%, white 4%);
+  border: 1px solid var(--color-intaglio);
+  /* The engraved border: a hairline inset from the plate edge, exactly as an
+     intaglio plate is inked. */
+  box-shadow: inset 0 0 0 1px var(--color-rag), inset 0 0 0 3px color-mix(in oklab, var(--color-intaglio) 40%, transparent);
+  padding: 1.15rem 1.3rem;
+}
+
+.plate-title {
+  font-family: var(--font-ledger);
+  font-size: 0.625rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-intaglio-mid);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-intaglio) 22%, transparent);
+}
+
+/* The counterfoil: the stub of a cheque, torn along a perforation. Used for
+   the identifying half of a receipt, which is exactly what a counterfoil is
+   for -- the part you keep when the instrument itself goes elsewhere. */
+.counterfoil {
+  border-right: 2px dashed color-mix(in oklab, var(--color-intaglio) 34%, transparent);
+  padding-right: 1.25rem;
+  margin-right: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .counterfoil {
+    border-right: none;
+    border-bottom: 2px dashed color-mix(in oklab, var(--color-intaglio) 34%, transparent);
+    padding-right: 0;
+    margin-right: 0;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Type
+   -------------------------------------------------------------------------- */
+
+.mono {
+  font-family: var(--font-ledger);
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+}
+
+.hash {
+  font-family: var(--font-ledger);
+  font-size: 0.6875rem;
+  word-break: break-all;
+  color: var(--color-intaglio-mid);
+}
+
+.label {
+  font-family: var(--font-ledger);
+  font-size: 0.5625rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-intaglio-faint);
+}
+
+.figure {
+  font-family: var(--font-plate);
+  font-size: 2rem;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Stamps. A verdict is stamped on the document, not printed in a table cell.
+   -------------------------------------------------------------------------- */
+
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-ledger);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.6rem;
+  border: 2px solid currentColor;
+  /* Rubber stamps are never quite square to the page. */
+  transform: rotate(-1.4deg);
+}
+
+.stamp-valid {
+  color: var(--color-intaglio-mid);
+}
+
+.stamp-void {
+  color: var(--color-vermilion);
+  border-style: double;
+  border-width: 4px;
+}
+
+.stamp-pending {
+  color: var(--color-ochre);
+  border-style: dashed;
+}
+
+.stamp-note {
+  color: var(--color-indigo-stamp);
+  border-width: 1px;
+  transform: none;
+}
+
+/* --------------------------------------------------------------------------
+   Motion. Two animations, both meaning something.
+   -------------------------------------------------------------------------- */
+
+/* An engraving plate inks from the centre outwards. Used once, on the rosette,
+   as a receipt's seal is drawn. */
+@keyframes ink {
+  from {
+    opacity: 0;
+    transform: scale(0.92) rotate(-6deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.ink-in {
+  animation: ink 520ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+/* A verification in progress moves a light across the plate, the way a note is
+   checked under a lamp. It runs only while a check is actually running. */
+@keyframes lamp {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(210%);
+  }
+}
+
+.lamp::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--color-ochre) 26%, transparent),
+    transparent
+  );
+  animation: lamp 1.15s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Rows arriving in the ledger settle in, one after another. The stagger is set
+   inline per row so a page of forty does not animate as one block. */
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.settle {
+  animation: settle 340ms ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ink-in,
+  .settle {
+    animation: none !important;
+  }
+  .lamp::after {
+    animation: none !important;
+    opacity: 0.3;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Tables read as a printed register.
+   -------------------------------------------------------------------------- */
+
+.register {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ledger);
+  font-size: 0.75rem;
+}
+
+.register th {
+  text-align: left;
+  font-weight: 400;
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-intaglio-faint);
+  padding: 0 0.6rem 0.4rem 0;
+  border-bottom: 1px solid var(--color-intaglio);
+}
+
+.register td {
+  padding: 0.4rem 0.6rem 0.4rem 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-intaglio) 14%, transparent);
+  vertical-align: top;
+}
+
+.register tbody tr:hover {
+  background: color-mix(in oklab, var(--color-intaglio) 5%, transparent);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.underlink {
+  border-bottom: 1px solid color-mix(in oklab, var(--color-intaglio) 35%, transparent);
+}
+
+.underlink:hover {
+  border-bottom-color: var(--color-vermilion);
+}
