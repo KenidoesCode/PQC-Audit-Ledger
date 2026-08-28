@@ -6,22 +6,34 @@ import { ensureBootstrapped } from "@/db/bootstrap";
 import { merkleBatches, merkleLeaves } from "@/db/schema";
 import { buildLevels, buildProof, verifyProof } from "@/crypto/merkle";
 import { unanchoredCount } from "@/audit/ledger";
-import { Hash, Plate, Stamp } from "@/ui/plate";
+import { Dim, Hash, Plate, Tag } from "@/ui/plate";
+import { WheelPack } from "@/ui/wheel-pack";
 
 export const dynamic = "force-dynamic";
 
 /**
  * The Merkle page draws the actual tree, not a picture of one.
  *
- * Every node rendered below is computed from the stored leaves by the same
- * function the proof generator uses. A tree drawn from a diagram would be a
- * claim; this one is the object.
+ * Every node the wheel pack divides a ring into is computed from the stored
+ * leaves by the same function the proof generator uses. A tree drawn from a
+ * diagram would be a claim; this one is the object.
  *
- * The odd-leaf rule is visible in the drawing: a promoted node sits at the same
- * horizontal position on two adjacent levels and is marked. That rule is the
- * difference between this tree and the Bitcoin-style duplicate-last tree that
- * admits CVE-2012-2459, and it is worth being able to point at.
+ * The odd-leaf rule is visible in the drawing: a promoted node is marked in
+ * oxide on its ring, and marked with an arrow in the node listing. That rule is
+ * the difference between this tree and the Bitcoin-style duplicate-last tree
+ * that admits CVE-2012-2459, and it is worth being able to point at.
+ *
+ * WHAT IS CAPPED AND WHY. The whole tree is computed. The node listing renders
+ * the first NODES_SHOWN nodes of each level and says how many it left out,
+ * because a level of four hundred sixty-four-character nodes is a quarter of a
+ * megabyte of HTML that nobody reads. The wheel pack is drawn from every level
+ * at its true node count, and the complete tree is in the bundle and in
+ * /api/merkle/proof.
  */
+
+const NODES_SHOWN = 32;
+const LEAVES_SHOWN = 50;
+
 export default async function MerklePage({ searchParams }: { searchParams: Promise<{ batch?: string }> }) {
   await ensureBootstrapped();
   const db = await getDb();
@@ -65,104 +77,117 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <p className="label">Merkle anchoring</p>
-          <h1 className="text-2xl">
+          <h1 className="h-part mt-1">
             Batch of {selected.treeSize}, sequences {selected.fromSequence}–{selected.toSequence}
           </h1>
-          <p className="mt-1 max-w-3xl text-sm text-[var(--color-intaglio-mid)]">
+          <p className="lede mt-2 max-w-3xl">
             The signature says who wrote a receipt and that it has not changed. The root says the receipt was in
             the ledger when this batch was sealed. Two different statements, made at two different times over
             two different things — this page is about the second one.
           </p>
         </div>
-        <Stamp kind={rootMatches ? "valid" : "void"}>
+        <Tag kind={rootMatches ? "valid" : "void"}>
           {rootMatches ? "Root rebuilds" : "Root does not rebuild"}
-        </Stamp>
+        </Tag>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
-        <Plate title="The tree">
-          <div className="space-y-4 overflow-x-auto">
-            {[...levels].reverse().map((level, reversedIndex) => {
-              const levelIndex = levels.length - 1 - reversedIndex;
-              const below = levels[levelIndex - 1];
-              return (
-                <div key={levelIndex}>
-                  <p className="label mb-1">
-                    {levelIndex === 0
-                      ? "leaves — SHA-256(0x00 || payload hash)"
-                      : levelIndex === levels.length - 1
-                        ? "root"
-                        : "level " + levelIndex}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {level.map((node, nodeIndex) => {
-                      const promoted =
-                        below !== undefined && below.length % 2 === 1 && nodeIndex === level.length - 1;
-                      return (
-                        <span
-                          key={node + nodeIndex}
-                          title={node}
-                          className={
-                            "settle border px-1.5 py-1 font-[family-name:var(--font-ledger)] text-[0.625rem] " +
-                            (levelIndex === levels.length - 1
-                              ? "border-[var(--color-intaglio)] bg-[color-mix(in_oklab,var(--color-intaglio)_10%,transparent)]"
-                              : promoted
-                                ? "border-dashed border-[var(--color-ochre)] text-[var(--color-ochre)]"
-                                : "border-[color-mix(in_oklab,var(--color-intaglio)_28%,transparent)]")
-                          }
-                          style={{ animationDelay: Math.min(nodeIndex, 30) * 14 + "ms" }}
-                        >
-                          {node.slice(0, 8)}
-                          {promoted && " ↑"}
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <Plate title="The wheel pack">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:items-start">
+            <WheelPack levels={levels} proofIndex={sampleIndex} />
+
+            <div className="min-w-0 space-y-4">
+              {[...levels].reverse().map((level, reversedIndex) => {
+                const levelIndex = levels.length - 1 - reversedIndex;
+                const below = levels[levelIndex - 1];
+                const promotedIndex =
+                  below !== undefined && below.length % 2 === 1 ? level.length - 1 : null;
+                const shown = level.slice(0, NODES_SHOWN);
+                const hidden = level.length - shown.length;
+                return (
+                  <div key={levelIndex} className="min-w-0">
+                    <p className="label mb-1">
+                      {levelIndex === 0
+                        ? "leaves — SHA-256(0x00 ‖ payload hash) — " + level.length + " nodes"
+                        : levelIndex === levels.length - 1
+                          ? "root"
+                          : "level " + levelIndex + " — " + level.length + " nodes"}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {shown.map((node, nodeIndex) => {
+                        const promoted = promotedIndex !== null && nodeIndex === promotedIndex;
+                        return (
+                          <span
+                            key={node + nodeIndex}
+                            title={node}
+                            className={
+                              "node" +
+                              (levelIndex === levels.length - 1 ? " node-root" : promoted ? " node-promoted" : "")
+                            }
+                          >
+                            {node.slice(0, 8)}
+                            {promoted && " ↑"}
+                          </span>
+                        );
+                      })}
+                      {hidden > 0 && (
+                        <span className="node node-more">
+                          + {hidden} more
+                          {promotedIndex !== null && promotedIndex >= NODES_SHOWN
+                            ? ", including the promoted node at index " + promotedIndex
+                            : ""}
                         </span>
-                      );
-                    })}
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-          <p className="mt-4 text-xs text-[var(--color-intaglio-soft)]">
-            A node marked <span className="text-[var(--color-ochre)]">↑</span> was promoted: an odd node at that
-            level, carried up unchanged rather than hashed against a duplicate of itself. Duplicate-last is the
-            Bitcoin rule and it admits two distinct leaf sets that produce the same root. Promotion has no such
-            collision.
+
+          <p className="mt-4 text-xs t-2">
+            A node marked <span className="t-void">↑</span> was promoted: an odd node at that level, carried up
+            unchanged rather than hashed against a duplicate of itself. Duplicate-last is the Bitcoin rule and
+            it admits two distinct leaf sets that produce the same root. Promotion has no such collision.
+          </p>
+          <p className="mt-2 text-xs t-3">
+            The tree is computed in full and the wheel pack is drawn from every level at its true node count.
+            The listing prints the first {NODES_SHOWN} nodes of each level and says how many it left out. The
+            complete tree is in the audit bundle and at <code className="mono">/api/merkle/proof</code>.
           </p>
         </Plate>
 
         <div className="space-y-5">
           <Plate title="Root">
-            <p className="hash break-all">{selected.root}</p>
+            <p className="hash">{selected.root}</p>
             <div className="mt-3 space-y-1.5">
-              <Row label="Algorithm" value={selected.algorithm} />
-              <Row label="Tree size" value={String(selected.treeSize)} />
-              <Row label="Levels" value={String(levels.length)} />
-              <Row label="Rebuilds" value={rootMatches ? "yes" : "NO"} />
-              <Row label="Unanchored" value={String(unanchored)} />
+              <Dim label="Algorithm" value={selected.algorithm} />
+              <Dim label="Tree size" value={String(selected.treeSize)} />
+              <Dim label="Levels" value={String(levels.length)} />
+              <Dim label="Rebuilds" value={rootMatches ? "yes" : "NO"} tone={rootMatches ? undefined : "void"} />
+              <Dim label="Unanchored" value={String(unanchored)} />
             </div>
           </Plate>
 
           {sampleProof && sampleCheck && (
             <Plate title="A proof, checked here">
-              <p className="text-xs text-[var(--color-intaglio-soft)]">
-                Leaf 0, folded {sampleProof.siblings.length} times.
-              </p>
+              <p className="text-xs t-2">Leaf 0, folded {sampleProof.siblings.length} times.</p>
               <ol className="mt-2 space-y-1">
                 {sampleProof.siblings.map((sibling, i) => (
-                  <li key={sibling + i} className="flex items-baseline gap-2 text-[0.6875rem]">
+                  <li key={sibling + i} className="flex min-w-0 items-baseline gap-2">
                     <span className="label w-12 shrink-0">{sampleProof.directions[i]}</span>
                     <Hash value={sibling} chars={22} />
                   </li>
                 ))}
               </ol>
               <div className="mt-3">
-                <Stamp kind={sampleCheck.valid ? "valid" : "void"}>
+                <Tag kind={sampleCheck.valid ? "valid" : "void"}>
                   {sampleCheck.valid ? "Reproduces the root" : String(sampleCheck.reason)}
-                </Stamp>
+                </Tag>
               </div>
-              <p className="mt-3 text-xs text-[var(--color-intaglio-soft)]">
+              <p className="mt-3 text-xs t-2">
                 Fetch any receipt&apos;s proof at{" "}
                 <code className="mono">/api/merkle/proof/&lt;receiptId&gt;</code> and check it yourself with the
                 offline verifier.
@@ -173,7 +198,7 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
           <Plate title="Batches">
             <ul className="space-y-1.5">
               {batches.map((batch) => (
-                <li key={batch.id}>
+                <li key={batch.id} className="min-w-0">
                   <Link
                     href={"/merkle?batch=" + batch.id}
                     className={"mono underlink " + (batch.id === selected.id ? "font-semibold" : "")}
@@ -188,44 +213,46 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
       </div>
 
       <Plate title="Leaves in this batch">
-        <table className="register">
-          <thead>
-            <tr>
-              <th>Index</th>
-              <th>Receipt</th>
-              <th>Payload hash</th>
-              <th>Leaf hash</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaves.map((leaf) => (
-              <tr key={leaf.batchId + leaf.leafIndex}>
-                <td className="text-[var(--color-intaglio-faint)]">{leaf.leafIndex}</td>
-                <td>
-                  <Link href={"/receipts/" + leaf.receiptId} className="underlink">
-                    {leaf.receiptId}
-                  </Link>
-                </td>
-                <td>
-                  <Hash value={leaf.payloadHash} />
-                </td>
-                <td>
-                  <Hash value={leaf.leafHash} />
-                </td>
+        <div className="scrollx">
+          <table className="register">
+            <thead>
+              <tr>
+                <th>Index</th>
+                <th>Receipt</th>
+                <th>Payload hash</th>
+                <th>Leaf hash</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {leaves.slice(0, LEAVES_SHOWN).map((leaf) => (
+                <tr key={leaf.batchId + leaf.leafIndex}>
+                  <td className="t-3">{leaf.leafIndex}</td>
+                  <td>
+                    <Link href={"/receipts/" + leaf.receiptId} className="underlink">
+                      {leaf.receiptId}
+                    </Link>
+                  </td>
+                  <td>
+                    <Hash value={leaf.payloadHash} />
+                  </td>
+                  <td>
+                    <Hash value={leaf.leafHash} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 text-xs t-3">
+          {leaves.length <= LEAVES_SHOWN
+            ? "All " + leaves.length + " leaves in this batch, in ledger order."
+            : "Showing leaves 0–" +
+              (LEAVES_SHOWN - 1) +
+              " of " +
+              leaves.length +
+              ", in ledger order. Every leaf is in the audit bundle; none of them is omitted from the root."}
+        </p>
       </Plate>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3">
-      <span className="label">{label}</span>
-      <span className="mono">{value}</span>
     </div>
   );
 }

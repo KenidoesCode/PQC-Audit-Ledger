@@ -90,7 +90,7 @@ export function AgentBench() {
               setText(preset.text);
               setAuthority(preset.authority);
             }}
-            className="border border-[color-mix(in_oklab,var(--color-intaglio)_30%,transparent)] px-2 py-1 font-[family-name:var(--font-ledger)] text-[0.5625rem] uppercase tracking-[0.14em] hover:bg-[color-mix(in_oklab,var(--color-intaglio)_8%,transparent)]"
+            className="key preset"
           >
             {preset.label}
           </button>
@@ -104,7 +104,7 @@ export function AgentBench() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
-            className="mono border border-[var(--color-intaglio)] bg-transparent px-2 py-1.5"
+            className="slot"
           />
         </label>
 
@@ -113,7 +113,7 @@ export function AgentBench() {
           <select
             value={authority}
             onChange={(e) => setAuthority(e.target.value)}
-            className="mono border border-[var(--color-intaglio)] bg-transparent px-2 py-1.5"
+            className="slot"
           >
             <option value="standard">standard grant</option>
             <option value="narrow">one merchant only</option>
@@ -127,16 +127,16 @@ export function AgentBench() {
           type="button"
           onClick={() => void submit()}
           disabled={busy || text.trim().length === 0}
-          className="relative overflow-hidden border-2 border-[var(--color-intaglio)] px-4 py-2 font-[family-name:var(--font-ledger)] text-[0.625rem] uppercase tracking-[0.18em] disabled:opacity-50"
+          className={"key " + (busy ? "inspecting relative overflow-hidden" : "")}
         >
           {busy ? "Running" : "Run the flow"}
         </button>
       </div>
 
-      {error && <p className="text-sm text-[var(--color-vermilion)]">{error}</p>}
+      {error && <p className="text-sm t-void">{error}</p>}
 
       {log.length === 0 ? (
-        <p className="border border-dashed border-[color-mix(in_oklab,var(--color-intaglio)_28%,transparent)] px-4 py-6 text-center text-sm text-[var(--color-intaglio-soft)]">
+        <p className="hollow">
           Nothing run yet. Each run writes four to seven signed receipts, whichever way the decision goes.
         </p>
       ) : (
@@ -144,14 +144,14 @@ export function AgentBench() {
           {log.map((entry) => (
             <li
               key={entry.actionId}
-              className="settle border-l-2 pl-3"
+              className="settling border-l-2 pl-3"
               style={{
                 borderColor:
                   entry.decision === "ALLOWED"
-                    ? "var(--color-intaglio-mid)"
+                    ? "var(--brass)"
                     : entry.decision === "DENIED"
-                      ? "var(--color-vermilion)"
-                      : "var(--color-ochre)",
+                      ? "var(--oxide-fill)"
+                      : "var(--brass-lit)",
               }}
             >
               <div className="flex flex-wrap items-baseline gap-3">
@@ -161,8 +161,8 @@ export function AgentBench() {
                     (entry.decision === "ALLOWED"
                       ? ""
                       : entry.decision === "DENIED"
-                        ? "text-[var(--color-vermilion)]"
-                        : "text-[var(--color-ochre)]")
+                        ? "t-void"
+                        : "t-brass")
                   }
                 >
                   {entry.decision}
@@ -173,7 +173,7 @@ export function AgentBench() {
               </div>
 
               {entry.ignoredDirectives.length > 0 && (
-                <p className="mt-1 text-xs text-[var(--color-vermilion)]">
+                <p className="mt-1 text-xs t-void">
                   Directives seen and not obeyed: {entry.ignoredDirectives.join(", ")}. Recorded in the receipt,
                   because an injection that leaves no trace cannot be investigated later.
                 </p>
@@ -181,7 +181,7 @@ export function AgentBench() {
 
               <ul className="mt-1 space-y-0.5">
                 {entry.reasons.map((reason) => (
-                  <li key={reason} className="text-xs text-[var(--color-intaglio-mid)]">
+                  <li key={reason} className="text-xs t-2">
                     {reason}
                   </li>
                 ))}
@@ -189,7 +189,7 @@ export function AgentBench() {
 
               <div className="mt-1.5 flex flex-wrap gap-2">
                 {entry.receiptIds.map((id) => (
-                  <a key={id} href={"/receipts/" + id} className="underlink font-[family-name:var(--font-ledger)] text-[0.625rem]">
+                  <a key={id} href={"/receipts/" + id} className="underlink mono">
                     {id.slice(0, 14)}
                   </a>
                 ))}

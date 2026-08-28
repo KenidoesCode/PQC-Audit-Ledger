@@ -4,7 +4,7 @@ import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { ensureBootstrapped } from "@/db/bootstrap";
 import { agentActions, humanReviews } from "@/db/schema";
-import { Plate, Stamp, inr } from "@/ui/plate";
+import { Plate, Tag, inr } from "@/ui/plate";
 
 export const dynamic = "force-dynamic";
 
@@ -32,10 +32,10 @@ export default async function ReviewPage() {
 
   return (
     <div className="space-y-5">
-      <div>
+      <div className="min-w-0">
         <p className="label">Human review</p>
-        <h1 className="text-2xl">{pending.length} actions the system would not take alone</h1>
-        <p className="mt-1 max-w-3xl text-sm text-[var(--color-intaglio-mid)]">
+        <h1 className="h-part mt-1">{pending.length} actions the system would not take alone</h1>
+        <p className="lede mt-2 max-w-3xl">
           These are not denials. The authority covers them; the policy escalated because of the amount, or
           because the agent was not confident enough about what it had been asked to do. An escalation and a
           refusal are different outcomes and the ledger keeps them apart.
@@ -46,39 +46,43 @@ export default async function ReviewPage() {
         {pending.length === 0 ? (
           <p className="text-sm">Nothing is waiting on a person.</p>
         ) : (
-          <table className="register">
-            <thead>
-              <tr>
-                <th>Amount</th>
-                <th>Merchant</th>
-                <th>Why it escalated</th>
-                <th>Outcome</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pending.map((action, i) => {
-                const review = reviewed.get(action.id);
-                return (
-                  <tr key={action.id} className="settle" style={{ animationDelay: Math.min(i, 20) * 22 + "ms" }}>
-                    <td>{inr(action.amountMinor)}</td>
-                    <td>{action.merchantId}</td>
-                    <td className="max-w-[34rem] text-[var(--color-intaglio-soft)]">
-                      {action.decisionReasons.join(" ")}
-                    </td>
-                    <td>
-                      {review ? (
-                        <span className={review.outcome === "OVERRIDDEN" ? "text-[var(--color-ochre)]" : ""}>
-                          {review.outcome}
-                        </span>
-                      ) : (
-                        <span className="text-[var(--color-intaglio-faint)]">awaiting</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="scrollx">
+            <table className="register">
+              <thead>
+                <tr>
+                  <th>Amount</th>
+                  <th>Merchant</th>
+                  <th>Why it escalated</th>
+                  <th>Outcome</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pending.map((action, i) => {
+                  const review = reviewed.get(action.id);
+                  return (
+                    <tr
+                      key={action.id}
+                      className="settling"
+                      style={{ animationDelay: Math.min(i, 20) * 22 + "ms" }}
+                    >
+                      <td>{inr(action.amountMinor)}</td>
+                      <td>{action.merchantId}</td>
+                      <td className="max-w-[34rem] t-2">{action.decisionReasons.join(" ")}</td>
+                      <td>
+                        {review ? (
+                          <span className={review.outcome === "OVERRIDDEN" ? "t-brass" : ""}>
+                            {review.outcome}
+                          </span>
+                        ) : (
+                          <span className="t-3">awaiting</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </Plate>
 
@@ -91,12 +95,12 @@ export default async function ReviewPage() {
             trigger, so the record of the refusal survives the decision to overrule it.
           </p>
           <p>
-            That is what makes a review queue auditable rather than decorative. Six months later the question is
-            never whether this was approved. It is who approved it, after it had been refused, and what they
-            said at the time.
+            That is what makes a review queue auditable rather than decorative. Six months later the question
+            is never whether this was approved. It is who approved it, after it had been refused, and what
+            they said at the time.
           </p>
           <div className="flex flex-wrap items-center gap-3 pt-1">
-            <Stamp kind="note">Reviews recorded: {reviews.length}</Stamp>
+            <Tag kind="note">Reviews recorded: {reviews.length}</Tag>
             <Link href="/receipts" className="underlink label">
               Review receipts in the ledger
             </Link>

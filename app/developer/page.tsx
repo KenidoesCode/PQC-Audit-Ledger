@@ -12,13 +12,48 @@ import { Plate } from "@/ui/plate";
 export const dynamic = "force-dynamic";
 
 const ENDPOINTS = [
-  { method: "POST", path: "/api/agent/act", body: '{ "text": "Order coffee from Blue Tokai for INR 899", "authority": "standard" }', note: "Runs the whole flow and returns the receipt ids." },
-  { method: "POST", path: "/api/policy/validate", body: '{ "toolName": "payments.create_order", "merchantId": "mrc_blue_tokai", "amountMinor": 89900, "currency": "INR" }', note: "Evaluates policy without writing anything. Returns every rule." },
-  { method: "POST", path: "/api/verify", body: '{ "receiptId": "rcp_...", "tamper": { "field": "event.amountMinor", "value": "999999" } }', note: "Verify as stored, or with a tamper, a wrong key, or no signature." },
-  { method: "GET", path: "/api/audit?limit=100&order=asc", body: null, note: "The ledger, including each receipt body." },
-  { method: "GET", path: "/api/merkle/proof/<receiptId>", body: null, note: "Leaf, siblings, directions, root, batch." },
-  { method: "POST", path: "/api/evaluate", body: '{ "split": "held-out" }', note: "Runs the mutation evaluation and stores the result." },
-  { method: "POST", path: "/api/demo/<scenario>", body: null, note: "One of the five demonstrations, run live." },
+  {
+    method: "POST",
+    path: "/api/agent/act",
+    body: '{ "text": "Order coffee from Blue Tokai for INR 899", "authority": "standard" }',
+    note: "Runs the whole flow and returns the receipt ids.",
+  },
+  {
+    method: "POST",
+    path: "/api/policy/validate",
+    body: '{ "toolName": "payments.create_order", "merchantId": "mrc_blue_tokai", "amountMinor": 89900, "currency": "INR" }',
+    note: "Evaluates policy without writing anything. Returns every rule.",
+  },
+  {
+    method: "POST",
+    path: "/api/verify",
+    body: '{ "receiptId": "rcp_...", "tamper": { "field": "event.amountMinor", "value": "999999" } }',
+    note: "Verify as stored, or with a tamper, a wrong key, or no signature.",
+  },
+  {
+    method: "GET",
+    path: "/api/audit?limit=100&order=asc",
+    body: null,
+    note: "The ledger, including each receipt body.",
+  },
+  {
+    method: "GET",
+    path: "/api/merkle/proof/<receiptId>",
+    body: null,
+    note: "Leaf, siblings, directions, root, batch.",
+  },
+  {
+    method: "POST",
+    path: "/api/evaluate",
+    body: '{ "split": "held-out" }',
+    note: "Runs the mutation evaluation and stores the result.",
+  },
+  {
+    method: "POST",
+    path: "/api/demo/<scenario>",
+    body: null,
+    note: "One of the five demonstrations, run live.",
+  },
   { method: "GET", path: "/api/bundle", body: null, note: "Downloads the offline audit bundle." },
   { method: "GET", path: "/api/health", body: null, note: "Suite, keys, chain state." },
 ];
@@ -31,20 +66,20 @@ export default async function DeveloperPage() {
 
   return (
     <div className="space-y-5">
-      <div>
+      <div className="min-w-0">
         <p className="label">Developer</p>
-        <h1 className="text-2xl">Everything this system does is reachable over HTTP</h1>
+        <h1 className="h-part mt-1">Everything this system does is reachable over HTTP</h1>
       </div>
 
       <Plate title="Endpoints">
         <div className="space-y-3">
           {ENDPOINTS.map((endpoint) => (
-            <div key={endpoint.path} className="border-l-2 border-[color-mix(in_oklab,var(--color-intaglio)_30%,transparent)] pl-3">
+            <div key={endpoint.path} className="border-l-2 border-[rgba(45,52,58,0.32)] pl-3">
               <p className="mono">
-                <span className="text-[var(--color-vermilion)]">{endpoint.method}</span> {endpoint.path}
+                <span className="t-void">{endpoint.method}</span> {endpoint.path}
               </p>
               {endpoint.body && <p className="hash mt-0.5">{endpoint.body}</p>}
-              <p className="mt-0.5 text-xs text-[var(--color-intaglio-soft)]">{endpoint.note}</p>
+              <p className="mt-0.5 text-xs t-2">{endpoint.note}</p>
             </div>
           ))}
         </div>
@@ -65,10 +100,10 @@ export default async function DeveloperPage() {
             <li>Standard JSON string escaping.</li>
             <li>UTF-8. Nothing downstream re-encodes.</li>
           </ol>
-          <p className="mt-3 text-xs text-[var(--color-intaglio-soft)]">
-            {CANONICALIZATION.name} — {CANONICALIZATION.reference}. Written out here rather than left implicit,
-            because the only real defence against a canonicalizer bug is somebody else implementing these rules
-            from the description and getting the same bytes.
+          <p className="mt-3 text-xs t-2">
+            {CANONICALIZATION.name} — {CANONICALIZATION.reference}. Written out here rather than left
+            implicit, because the only real defence against a canonicalizer bug is somebody else implementing
+            these rules from the description and getting the same bytes.
           </p>
         </Plate>
 
@@ -97,21 +132,21 @@ export default async function DeveloperPage() {
               <strong>Empty tree:</strong> rejected.
             </li>
           </ul>
-          <p className="mt-3 text-xs text-[var(--color-intaglio-soft)]">{MERKLE_ALGORITHM}</p>
+          <p className="mt-3 text-xs t-2">{MERKLE_ALGORITHM}</p>
         </Plate>
       </div>
 
       <Plate title="A receipt, canonicalized">
-        <p className="mb-2 text-xs text-[var(--color-intaglio-soft)]">
+        <p className="mb-2 text-xs t-2">
           {HASH_ALGORITHM} over exactly these bytes is the payload hash. ML-DSA-65 over exactly these bytes is
           the signature.
         </p>
-        <pre className="hash max-h-[20rem] overflow-auto whitespace-pre-wrap">{canonical}</pre>
+        <pre className="trough trough-wrap max-h-[20rem] overflow-auto">{canonical}</pre>
       </Plate>
 
       <Plate title="Running the offline verifier">
-        <pre className="hash overflow-x-auto whitespace-pre bg-[color-mix(in_oklab,var(--color-intaglio)_5%,transparent)] p-3">
-{`# download the evidence and the checker
+        <pre className="trough">
+          {`# download the evidence and the checker
 curl -O https://<this-host>/api/bundle
 curl -O https://<this-host>/ledger-verify.mjs
 

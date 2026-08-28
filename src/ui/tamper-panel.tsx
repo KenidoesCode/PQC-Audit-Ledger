@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { CRITICAL_FIELDS } from "@/audit/receipt";
-import { Rosette } from "./rosette";
+import { MilledDisc } from "./disc";
 
 /**
  * The tamper bench.
@@ -11,10 +11,12 @@ import { Rosette } from "./rosette";
  * ===========================================================================
  * WHAT MAKES THIS DIFFERENT FROM A BADGE THAT SAYS "INVALID"
  * ===========================================================================
- * The seal is redrawn from the recomputed payload hash. Change one field and
- * the rosette visibly becomes a different figure, side by side with the
- * original -- before a single line of hex has been read. A red badge tells you
- * the system decided something; two different engravings let you see it.
+ * The seal is re-milled from the recomputed payload hash and set on the bench
+ * beside the original. Change one field and the second disc is visibly a
+ * different part -- different sector cuts at different radii, different index
+ * notches -- before a single line of hex has been read. A red badge tells you
+ * the system decided something; two discs that do not gauge the same let you
+ * see it.
  *
  * The stored hash and signature are never touched. What is modified is a copy
  * of the receipt body, which is exactly the position an attacker with write
@@ -85,7 +87,7 @@ export function TamperPanel({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-3">
-        <label className="flex flex-col gap-1">
+        <label className="flex min-w-0 flex-col gap-1">
           <span className="label">Field</span>
           <select
             value={field}
@@ -93,7 +95,7 @@ export function TamperPanel({
               setField(e.target.value);
               setValue(fieldValues[e.target.value] ?? "");
             }}
-            className="mono border border-[var(--color-intaglio)] bg-transparent px-2 py-1"
+            className="slot"
           >
             {available.map((f) => (
               <option key={f} value={f}>
@@ -103,65 +105,72 @@ export function TamperPanel({
           </select>
         </label>
 
-        <label className="flex min-w-[16rem] flex-1 flex-col gap-1">
+        <label className="flex min-w-[14rem] flex-1 flex-col gap-1">
           <span className="label">New value</span>
-          <input
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="mono border border-[var(--color-intaglio)] bg-transparent px-2 py-1"
-          />
+          <input value={value} onChange={(e) => setValue(e.target.value)} className="slot" />
         </label>
 
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => void run("clean")} busy={busy}>
+          <button type="button" onClick={() => void run("clean")} disabled={busy} className="key">
             Verify as stored
-          </Button>
-          <Button onClick={() => void run("tamper")} busy={busy} tone="void">
+          </button>
+          <button type="button" onClick={() => void run("tamper")} disabled={busy} className="key key-void">
             Tamper and verify
-          </Button>
-          <Button onClick={() => void run("wrongKey")} busy={busy}>
+          </button>
+          <button type="button" onClick={() => void run("wrongKey")} disabled={busy} className="key">
             Wrong key
-          </Button>
-          <Button onClick={() => void run("dropSignature")} busy={busy}>
+          </button>
+          <button type="button" onClick={() => void run("dropSignature")} disabled={busy} className="key">
             No signature
-          </Button>
+          </button>
         </div>
       </div>
 
-      <div className="grid gap-5 md:grid-cols-[auto_auto_1fr] md:items-start">
-        <div className="text-center">
-          <Rosette hash={originalHash} size={120} />
-          <p className="label mt-1">as stored</p>
-          <p className="hash">{originalHash.slice(0, 12)}</p>
+      {/* The two discs sit side by side on the bench. The gauge between them
+          reads what it reads: same part, or not the same part. */}
+      <div className="grid gap-5 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-start">
+        <div className="flex flex-wrap items-start justify-center gap-4">
+          <div className="text-center">
+            <MilledDisc hash={originalHash} size={128} />
+            <p className="label mt-1">as stored</p>
+            <p className="hash">{originalHash.slice(0, 12)}</p>
+          </div>
+
+          <div className="flex h-[128px] shrink-0 items-center">
+            <span className={"gauge " + (computed === null ? "gauge-idle" : changed ? "gauge-void" : "gauge-same")}>
+              {computed === null ? "?" : changed ? "≠" : "="}
+            </span>
+          </div>
+
+          <div className="text-center">
+            {computed ? (
+              <>
+                <MilledDisc
+                  key={computed}
+                  hash={computed}
+                  size={128}
+                  tone={changed ? "oxide" : "brass"}
+                  className="seated"
+                />
+                <p className="label mt-1">{changed ? "after your edit" : "recomputed"}</p>
+                <p className={"hash " + (changed ? "t-void" : "")}>{computed.slice(0, 12)}</p>
+              </>
+            ) : (
+              <>
+                <div className="blank flex h-[128px] w-[128px] items-center justify-center">
+                  <span className="label">uncut blank</span>
+                </div>
+                <p className="label mt-1">nothing milled yet</p>
+              </>
+            )}
+          </div>
         </div>
 
-        <div className="text-center">
-          {computed ? (
-            <>
-              <Rosette
-                key={computed}
-                hash={computed}
-                size={120}
-                tone={changed ? "vermilion" : "intaglio"}
-                className="ink-in"
-              />
-              <p className="label mt-1">{changed ? "after your edit" : "recomputed"}</p>
-              <p className={"hash " + (changed ? "text-[var(--color-vermilion)]" : "")}>
-                {computed.slice(0, 12)}
-              </p>
-            </>
-          ) : (
-            <div className="flex h-[120px] w-[120px] items-center justify-center border border-dashed border-[color-mix(in_oklab,var(--color-intaglio)_30%,transparent)]">
-              <span className="label">run a check</span>
-            </div>
-          )}
-        </div>
-
-        <div className={"relative overflow-hidden " + (busy ? "lamp" : "")}>
+        <div className={"relative min-w-0 overflow-hidden " + (busy ? "inspecting" : "")}>
           {response ? (
             <>
-              <div className="mb-3 flex items-center gap-3">
-                <span className={"stamp " + (response.result.valid ? "stamp-valid" : "stamp-void")}>
+              <div className="mb-3 flex flex-wrap items-center gap-3">
+                <span className={"tag " + (response.result.valid ? "tag-valid" : "tag-void")}>
                   {response.result.valid ? "Verified" : "Void"}
                 </span>
                 <span className="label">
@@ -176,25 +185,20 @@ export function TamperPanel({
               </div>
               <ul className="space-y-1.5">
                 {response.result.checks.map((check) => (
-                  <li key={check.name} className="flex gap-2 text-xs leading-snug">
-                    <span
-                      className={
-                        "mono shrink-0 " +
-                        (check.passed ? "text-[var(--color-intaglio-mid)]" : "text-[var(--color-vermilion)]")
-                      }
-                    >
+                  <li key={check.name} className="flex min-w-0 gap-2 text-xs leading-snug">
+                    <span className={"mono shrink-0 " + (check.passed ? "t-brass" : "t-void")}>
                       {check.passed ? "ok  " : "FAIL"}
                     </span>
-                    <span>
+                    <span className="min-w-0">
                       <span className="font-medium">{check.name}</span>
-                      <span className="text-[var(--color-intaglio-soft)]"> — {check.detail}</span>
+                      <span className="t-2"> — {check.detail}</span>
                     </span>
                   </li>
                 ))}
               </ul>
             </>
           ) : (
-            <p className="text-sm text-[var(--color-intaglio-soft)]">
+            <p className="text-sm t-2">
               Nothing has been checked yet. Start with <em>verify as stored</em>: if the untouched receipt does
               not verify, no other result on this page would mean anything.
             </p>
@@ -202,33 +206,5 @@ export function TamperPanel({
         </div>
       </div>
     </div>
-  );
-}
-
-function Button({
-  onClick,
-  children,
-  busy,
-  tone,
-}: {
-  onClick: () => void;
-  children: React.ReactNode;
-  busy: boolean;
-  tone?: "void";
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={busy}
-      className={
-        "border px-3 py-1.5 font-[family-name:var(--font-ledger)] text-[0.625rem] uppercase tracking-[0.16em] transition-colors disabled:opacity-50 " +
-        (tone === "void"
-          ? "border-[var(--color-vermilion)] text-[var(--color-vermilion)] hover:bg-[color-mix(in_oklab,var(--color-vermilion)_10%,transparent)]"
-          : "border-[var(--color-intaglio)] hover:bg-[color-mix(in_oklab,var(--color-intaglio)_8%,transparent)]")
-      }
-    >
-      {children}
-    </button>
   );
 }

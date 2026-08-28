@@ -68,10 +68,7 @@ export function DemoRunner() {
             onClick={() => void run(scenario.id)}
             disabled={running !== null}
             className={
-              "relative overflow-hidden border px-3 py-1.5 font-[family-name:var(--font-ledger)] text-[0.625rem] uppercase tracking-[0.14em] disabled:opacity-50 " +
-              (running === scenario.id
-                ? "lamp border-[var(--color-ochre)]"
-                : "border-[var(--color-intaglio)] hover:bg-[color-mix(in_oklab,var(--color-intaglio)_8%,transparent)]")
+              "key " + (running === scenario.id ? "inspecting relative overflow-hidden" : "")
             }
           >
             {scenario.label}
@@ -79,12 +76,12 @@ export function DemoRunner() {
         ))}
       </div>
 
-      {error && <p className="text-sm text-[var(--color-vermilion)]">{error}</p>}
+      {error && <p className="text-sm t-void">{error}</p>}
 
       {result && (
         <div className="space-y-3">
           <div className="flex flex-wrap items-baseline gap-3">
-            <span className={"stamp " + (result.passed ? "stamp-valid" : "stamp-void")}>
+            <span className={"tag " + (result.passed ? "tag-valid" : "tag-void")}>
               {result.passed ? "As expected" : "Not as expected"}
             </span>
             <p className="text-[0.9375rem]">{result.headline}</p>
@@ -94,17 +91,17 @@ export function DemoRunner() {
             {result.steps.map((step, i) => (
               <li
                 key={step.step}
-                className="settle grid gap-1 border-l-2 pl-3 sm:grid-cols-[13rem_1fr]"
+                className="settling grid gap-1 border-l-2 pl-3 sm:grid-cols-[13rem_1fr]"
                 style={{
                   animationDelay: i * 70 + "ms",
-                  borderColor: step.ok ? "var(--color-intaglio-mid)" : "var(--color-vermilion)",
+                  borderColor: step.ok ? "var(--brass)" : "var(--oxide-fill)",
                 }}
               >
                 <div>
                   <p className="mono font-medium">{step.step}</p>
-                  <p className={"label " + (step.ok ? "" : "text-[var(--color-vermilion)]")}>{step.outcome}</p>
+                  <p className={"label " + (step.ok ? "" : "t-void")}>{step.outcome}</p>
                 </div>
-                <p className="text-xs leading-snug text-[var(--color-intaglio-mid)]">{step.detail}</p>
+                <p className="text-xs leading-snug t-2">{step.detail}</p>
               </li>
             ))}
           </ol>
@@ -113,7 +110,7 @@ export function DemoRunner() {
             <div className="flex flex-wrap gap-2">
               <span className="label">receipts:</span>
               {result.receiptIds.slice(0, 8).map((id) => (
-                <a key={id} href={"/receipts/" + id} className="underlink font-[family-name:var(--font-ledger)] text-[0.625rem]">
+                <a key={id} href={"/receipts/" + id} className="underlink mono">
                   {id.slice(0, 14)}
                 </a>
               ))}

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+/** A machined face: one part, with its name struck into a milled channel. */
 export function Plate({
   title,
   right,
@@ -14,7 +15,7 @@ export function Plate({
   return (
     <section className={"plate " + (className ?? "")}>
       {title && (
-        <div className="plate-title flex items-baseline justify-between gap-3">
+        <div className="plate-title">
           <span>{title}</span>
           {right}
         </div>
@@ -27,20 +28,21 @@ export function Plate({
 export function Figure({ value, caption, tone }: { value: string; caption: string; tone?: "void" | "plain" }) {
   return (
     <div>
-      <p className={"figure " + (tone === "void" ? "text-[var(--color-vermilion)]" : "")}>{value}</p>
+      <p className={"figure " + (tone === "void" ? "t-void" : "")}>{value}</p>
       <p className="label mt-1">{caption}</p>
     </div>
   );
 }
 
-export function Stamp({
+/** A verdict struck into a metal tag and bolted on. */
+export function Tag({
   kind,
   children,
 }: {
   kind: "valid" | "void" | "pending" | "note";
   children: ReactNode;
 }) {
-  return <span className={"stamp stamp-" + kind}>{children}</span>;
+  return <span className={"tag tag-" + kind}>{children}</span>;
 }
 
 /**
@@ -53,7 +55,7 @@ export function Stamp({
  * decide it is the same one.
  */
 export function Hash({ value, chars = 16 }: { value: string | null; chars?: number }) {
-  if (!value) return <span className="hash text-[var(--color-intaglio-faint)]">(none)</span>;
+  if (!value) return <span className="hash t-3">(none)</span>;
   return (
     <span className="hash" title={value}>
       {value.length <= chars ? value : value.slice(0, chars) + "…"}
@@ -61,11 +63,23 @@ export function Hash({ value, chars = 16 }: { value: string | null; chars?: numb
   );
 }
 
-export function Empty({ children }: { children: ReactNode }) {
+/** Label left, measured value right, ruled between them like a drawing. */
+export function Dim({
+  label,
+  value,
+  tone,
+  ruled,
+}: {
+  label: string;
+  value: string;
+  tone?: "void";
+  ruled?: boolean;
+}) {
   return (
-    <p className="border border-dashed border-[color-mix(in_oklab,var(--color-intaglio)_30%,transparent)] px-4 py-6 text-center text-sm text-[var(--color-intaglio-soft)]">
-      {children}
-    </p>
+    <div className={"dim " + (ruled ? "dim-ruled" : "")}>
+      <span className="label">{label}</span>
+      <span className={"mono " + (tone === "void" ? "t-void" : "")}>{value}</span>
+    </div>
   );
 }
 

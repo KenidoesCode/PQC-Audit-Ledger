@@ -1,256 +1,732 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   SECURITY PRINTING
+   MACHINED STEEL
    ==========================================================================
-   The visual language of this system is the one the world already uses for
-   documents that must be checkable by a stranger: banknotes, share
-   certificates, bonded warehouse receipts. Intaglio green on rag paper, a
-   guilloché rosette, a counterfoil down the left edge, a perforated tear line.
+   WHY THIS VISUAL LANGUAGE, FOR THIS PRODUCT
 
-   That is not decoration chosen for mood. A signed receipt IS a certificate --
-   an instrument whose only value is that a third party can verify it without
-   trusting the issuer -- and five centuries of security printing is the design
-   tradition for exactly that problem. A dark neon dashboard would say
-   "blockchain product"; the specification (section 78) explicitly forbids that
-   and asks for trust infrastructure. This is what trust infrastructure has
-   always looked like.
+   This product is a vault. Its entire reason to exist is that a stranger can
+   check a receipt without trusting whoever issued it. The physical objects
+   humanity has built for that job -- safe doors, combination wheel packs,
+   machined seals, calibrated gauges -- share one property: their security is
+   geometric and it is visible on the face of the object. You do not take a
+   locksmith's word for a wheel pack. You look at where the gates line up.
 
-   The one place boldness is spent: the rosette. See ui/rosette.tsx -- its
-   geometry is derived from the receipt's own payload hash, so every receipt
-   engraves differently and a tampered receipt engraves visibly wrong.
+   That is the argument for steel here. A Merkle tree is a mechanism, not an
+   ornament: nodes fold in pairs, an odd node is promoted, a proof is the small
+   set of siblings that make the root come out. Mechanism is what machined metal
+   depicts natively. Engraved security printing (the previous treatment) argued
+   the same idea with ornament -- a rosette is hard to counterfeit but it does
+   not show you HOW it resists. A milled disc does: the cuts are at measurable
+   radii and you can see two discs disagree.
+
+   So: a brushed steel ground under a lit room, cool and grey, never a dark UI.
+   Panels are raised machined faces with a real bevel. Every panel carries a
+   milled nameplate channel -- a recess cut into the face with light characters
+   sitting in it, which is what "deep-engraved" means when the light comes from
+   above. Two accents and no more: machined brass-bronze for a seal that holds,
+   oxide red for one that does not. Brass and oxide are the only saturated
+   colour on the site, so a broken thing is visible from across a room.
+
+   WHERE THE BOLDNESS IS SPENT
+   ui/disc.tsx      -- the milled disc. Every turning mark, sector cut and index
+                       notch is read out of the receipt's payload hash. Two
+                       receipts mill the same disc only if they have the same
+                       hash. A tampered receipt mills visibly wrong, and the
+                       tamper bench sets the two discs side by side so the
+                       difference is seen before any hex is read.
+   ui/wheel-pack.tsx-- the Merkle batch as a combination wheel pack. One ring
+                       per level of the real tree, divided into the real node
+                       count, with the proof path drawn as the gates that line
+                       up and the promoted odd nodes marked on the rim.
+
+   Everything else is kept quiet on purpose.
    ========================================================================== */
 
-@theme {
-  --color-rag: #f4f1e6;
-  --color-rag-deep: #ebe6d6;
-  --color-rag-shadow: #ddd6c0;
+:root {
+  /* Engraved characters: dark, cut into a lit face. */
+  --ink: #1e2328;
+  --ink-2: #333a41;
+  --ink-3: #3c444b;
 
-  --color-intaglio: #14352a;
-  --color-intaglio-mid: #2f6b52;
-  --color-intaglio-soft: #5f8f78;
-  --color-intaglio-faint: #94ab9e;
+  /* The metal. Ground is the brushed plate the whole machine sits on; face is
+     a raised, separately-turned part; cut is the floor of a milled recess. */
+  --steel: #b2b8be;
+  --face: #c2c7cc;
+  --cut: #2f353b;
+  --cut-2: #3b424a;
+  --lip: #dfe3e6;
+  --edge: #7e868e;
 
-  --color-vermilion: #a8321c;
-  --color-vermilion-soft: #d9694f;
-  --color-ochre: #8a6a1f;
-  --color-indigo-stamp: #2b3f6b;
+  /* A seal that holds. */
+  --brass: #9c7a24;
+  --brass-lit: #d9b45e;
+  --brass-ink: #57400a;
 
-  --font-plate: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
-  --font-ledger: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
+  /* A seal that does not. */
+  --oxide: #7e2913;
+  --oxide-fill: #9a3418;
+  --oxide-lit: #d1653f;
+
+  /* Bahnschrift is Windows' shipped DIN -- the lettering standard for machine
+     plates and instrument faces. It is already on the machine; nothing is
+     downloaded. The fallbacks are the nearest condensed grotesques per system. */
+  --type-plate: "Bahnschrift", "DIN Alternate", "Avenir Next Condensed",
+    "HelveticaNeue-CondensedBold", "Arial Narrow", system-ui, sans-serif;
+  --type-body: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --type-data: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, Menlo, monospace;
 }
 
-* {
-  box-sizing: border-box;
-}
+@layer base {
+  * {
+    box-sizing: border-box;
+    min-width: 0;
+  }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
 
-body {
-  margin: 0;
-  background: var(--color-rag);
-  color: var(--color-intaglio);
-  font-family: var(--font-plate);
-  font-size: 15px;
-  line-height: 1.55;
-  /* The safety tint. Two very fine crossing rules at an angle, the way a
-     cheque background is printed -- visible on a screen only as texture, and
-     the thing that makes flat colour read as paper rather than as a div. */
-  background-image:
-    repeating-linear-gradient(
-      58deg,
-      color-mix(in oklab, var(--color-intaglio) 4%, transparent) 0 1px,
-      transparent 1px 7px
-    ),
-    repeating-linear-gradient(
-      -58deg,
-      color-mix(in oklab, var(--color-intaglio) 3%, transparent) 0 1px,
-      transparent 1px 9px
-    );
-}
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--type-body);
+    font-size: 15px;
+    line-height: 1.55;
+    background-color: var(--steel);
+    /* The grain. Two passes: a fine directional brush a few degrees off the
+       horizontal, and a slow top-to-bottom fall of light across the plate. A
+       flat grey div is a div; grain is what makes it metal. */
+    background-image:
+      repeating-linear-gradient(
+        94deg,
+        rgba(255, 255, 255, 0.075) 0 1px,
+        rgba(0, 0, 0, 0.045) 1px 2px,
+        transparent 2px 4px
+      ),
+      linear-gradient(176deg, rgba(255, 255, 255, 0.11), rgba(0, 0, 0, 0.08));
+  }
 
-/* --------------------------------------------------------------------------
-   The spine: navigation as the header rule of a printed document.
-   -------------------------------------------------------------------------- */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--type-plate);
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    line-height: 1.14;
+    margin: 0;
+    /* Deep-engraved: the glyph is the cut, and the light from above catches its
+       lower wall. One pixel, no glow. */
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.42);
+  }
 
-.spine {
-  border-bottom: 3px double var(--color-intaglio);
-  background: color-mix(in oklab, var(--color-rag) 92%, var(--color-intaglio) 8%);
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-.spine-inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.35rem 1.35rem;
-  max-width: 1500px;
-  margin: 0 auto;
-  padding: 0.55rem 1.5rem;
-}
+  :focus-visible {
+    outline: 2px solid var(--brass-ink);
+    outline-offset: 2px;
+  }
 
-.spine-link {
-  font-family: var(--font-ledger);
-  font-size: 0.6875rem;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--color-intaglio-soft);
-  padding-bottom: 2px;
-  border-bottom: 2px solid transparent;
-  white-space: nowrap;
-  transition: color 140ms ease;
-}
-
-.spine-link:hover {
-  color: var(--color-intaglio);
-}
-
-.spine-link[aria-current="page"] {
-  color: var(--color-intaglio);
-  border-bottom-color: var(--color-vermilion);
-}
-
-/* --------------------------------------------------------------------------
-   Certificates. Every receipt, every panel, is a printed instrument.
-   -------------------------------------------------------------------------- */
-
-.plate {
-  position: relative;
-  background: color-mix(in oklab, var(--color-rag) 96%, white 4%);
-  border: 1px solid var(--color-intaglio);
-  /* The engraved border: a hairline inset from the plate edge, exactly as an
-     intaglio plate is inked. */
-  box-shadow: inset 0 0 0 1px var(--color-rag), inset 0 0 0 3px color-mix(in oklab, var(--color-intaglio) 40%, transparent);
-  padding: 1.15rem 1.3rem;
-}
-
-.plate-title {
-  font-family: var(--font-ledger);
-  font-size: 0.625rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--color-intaglio-mid);
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-intaglio) 22%, transparent);
-}
-
-/* The counterfoil: the stub of a cheque, torn along a perforation. Used for
-   the identifying half of a receipt, which is exactly what a counterfoil is
-   for -- the part you keep when the instrument itself goes elsewhere. */
-.counterfoil {
-  border-right: 2px dashed color-mix(in oklab, var(--color-intaglio) 34%, transparent);
-  padding-right: 1.25rem;
-  margin-right: 1.25rem;
-}
-
-@media (max-width: 900px) {
-  .counterfoil {
-    border-right: none;
-    border-bottom: 2px dashed color-mix(in oklab, var(--color-intaglio) 34%, transparent);
-    padding-right: 0;
-    margin-right: 0;
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
+  ::selection {
+    background: var(--brass-lit);
+    color: var(--cut);
   }
 }
 
-/* --------------------------------------------------------------------------
-   Type
-   -------------------------------------------------------------------------- */
+@layer components {
+  /* ------------------------------------------------------------------------
+     THE FACEPLATE. Navigation is the machine's front panel: one gunmetal rail
+     with the plant name struck into it and the sections indexed along it.
+     ------------------------------------------------------------------------ */
 
-.mono {
-  font-family: var(--font-ledger);
-  font-size: 0.75rem;
-  letter-spacing: 0.01em;
+  .faceplate {
+    background: var(--cut);
+    background-image: repeating-linear-gradient(
+      94deg,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      rgba(0, 0, 0, 0.16) 1px 2px,
+      transparent 2px 4px
+    );
+    box-shadow:
+      inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+      0 1px 0 rgba(255, 255, 255, 0.4),
+      0 2px 5px rgba(20, 25, 30, 0.28);
+  }
+
+  .faceplate-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1.4rem;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0.6rem 1.5rem 0.5rem;
+  }
+
+  .faceplate-mark {
+    font-family: var(--type-plate);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--lip);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.7);
+  }
+
+  /* Section names are index marks along the rail. The one you are on gets a
+     brass notch cut under it -- the same notch language as the discs. */
+  .index-mark {
+    position: relative;
+    display: inline-block;
+    font-family: var(--type-plate);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9aa3ac;
+    padding-bottom: 5px;
+    transition: color 120ms linear;
+  }
+
+  .index-mark::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: transparent;
+  }
+
+  .index-mark:hover {
+    color: var(--lip);
+  }
+
+  .index-mark[aria-current="page"] {
+    color: var(--brass-lit);
+  }
+
+  .index-mark[aria-current="page"]::after {
+    background: var(--brass);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
+  }
+
+  /* ------------------------------------------------------------------------
+     PARTS. Every panel is a raised, separately machined face.
+     ------------------------------------------------------------------------ */
+
+  .plate {
+    position: relative;
+    border: 1px solid rgba(40, 47, 54, 0.34);
+    border-radius: 2px;
+    background-color: var(--face);
+    background-image: repeating-linear-gradient(
+      94deg,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      rgba(0, 0, 0, 0.028) 1px 2px,
+      transparent 2px 5px
+    );
+    box-shadow:
+      inset 0 1px 0 var(--lip),
+      inset 1px 0 0 rgba(255, 255, 255, 0.26),
+      inset -1px 0 0 rgba(0, 0, 0, 0.1),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+      0 1px 2px rgba(20, 25, 30, 0.2);
+    padding: 1.15rem 1.25rem;
+  }
+
+  /* The nameplate channel: a recess milled across the top of the part with the
+     part's name in it. Light characters, dark recess -- literally. */
+  .plate-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin: -0.35rem -0.45rem 0.85rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 1px;
+    background: var(--cut);
+    color: var(--lip);
+    font-family: var(--type-plate);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.7);
+    box-shadow:
+      inset 0 2px 3px rgba(0, 0, 0, 0.5),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .plate-title a {
+    color: var(--brass-lit);
+  }
+
+  .plate-title a:hover {
+    color: #f0d492;
+  }
+
+  /* A machined seam: where two parts are jointed, one edge in shadow and the
+     next in light. Replaces the old torn perforation. */
+  .seam {
+    border-right: 1px solid rgba(0, 0, 0, 0.28);
+    box-shadow: 1px 0 0 rgba(255, 255, 255, 0.42);
+    padding-right: 1.25rem;
+    margin-right: 1.25rem;
+  }
+
+  @media (max-width: 900px) {
+    .seam {
+      border-right: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.28);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.42);
+      padding-right: 0;
+      margin-right: 0;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     TYPE ROLES
+     ------------------------------------------------------------------------ */
+
+  .h-part {
+    font-family: var(--type-plate);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 1.05rem + 1.5vw, 2rem);
+    line-height: 1.12;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.42);
+  }
+
+  .lede {
+    font-size: 0.9375rem;
+    color: var(--ink-2);
+  }
+
+  .mono {
+    font-family: var(--type-data);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums lining-nums;
+    overflow-wrap: anywhere;
+  }
+
+  /* Long unbroken tokens -- hashes, ids, base64 -- break anywhere rather than
+     setting the width of whatever contains them. */
+  .hash {
+    font-family: var(--type-data);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .label {
+    font-family: var(--type-plate);
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .figure {
+    font-family: var(--type-plate);
+    font-weight: 600;
+    font-size: 1.95rem;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums lining-nums;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .t-2 {
+    color: var(--ink-2);
+  }
+
+  .t-3 {
+    color: var(--ink-3);
+  }
+
+  .t-void {
+    color: var(--oxide);
+  }
+
+  .t-brass {
+    color: var(--brass-ink);
+  }
+
+  .underlink {
+    border-bottom: 1px solid rgba(45, 52, 58, 0.35);
+  }
+
+  .underlink:hover {
+    border-bottom-color: var(--oxide-fill);
+  }
+
+  /* ------------------------------------------------------------------------
+     TAGS. A verdict is struck into a metal tag and bolted on, dead square --
+     machined parts are not stamped at an angle.
+     ------------------------------------------------------------------------ */
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--type-plate);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 1px;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    background: var(--cut);
+    color: var(--lip);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.65);
+    box-shadow:
+      inset 0 1px 2px rgba(0, 0, 0, 0.45),
+      0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .tag-valid {
+    color: var(--brass-lit);
+  }
+
+  .tag-void {
+    background: var(--oxide-fill);
+    color: #ffdccd;
+    border-color: rgba(0, 0, 0, 0.45);
+  }
+
+  .tag-pending {
+    color: #e2c98f;
+    background: var(--cut-2);
+  }
+
+  .tag-note {
+    color: #b9c2cb;
+    background: var(--cut-2);
+  }
+
+  /* ------------------------------------------------------------------------
+     CONTROLS
+     ------------------------------------------------------------------------ */
+
+  .key {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--type-plate);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding: 0.45rem 0.85rem;
+    border-radius: 2px;
+    border: 1px solid rgba(40, 47, 54, 0.4);
+    background: linear-gradient(180deg, #d3d8dc, #b6bcc2);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.75),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+      0 1px 2px rgba(20, 25, 30, 0.25);
+    cursor: pointer;
+    transition: background 100ms linear;
+  }
+
+  .key:hover:not(:disabled) {
+    background: linear-gradient(180deg, #dde2e5, #bfc5cb);
+  }
+
+  .key:active:not(:disabled) {
+    background: linear-gradient(180deg, #b0b6bc, #c6cbd0);
+    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.35);
+  }
+
+  .key:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  /* Brass-faced. Reserved for taking the evidence away: the audit bundle and
+     the offline verifier are the point of the whole project. */
+  .key-brass {
+    color: #22190a;
+    border-color: rgba(50, 37, 8, 0.55);
+    background: linear-gradient(180deg, #e0bd6c, #9c7a24);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 245, 210, 0.7),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+      0 1px 3px rgba(20, 25, 30, 0.3);
+    padding: 0.6rem 1.05rem;
+    font-size: 0.75rem;
+  }
+
+  .key-brass:hover:not(:disabled) {
+    background: linear-gradient(180deg, #ecca7d, #a9852a);
+  }
+
+  .key-brass:active:not(:disabled) {
+    background: linear-gradient(180deg, #8f7020, #c8a24a);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+  }
+
+  .key-void {
+    color: #fff0e9;
+    border-color: rgba(50, 15, 6, 0.55);
+    background: linear-gradient(180deg, #b04326, #7e2913);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 210, 190, 0.45),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+      0 1px 2px rgba(20, 25, 30, 0.3);
+  }
+
+  .key-void:hover:not(:disabled) {
+    background: linear-gradient(180deg, #bd4b2c, #8b2e15);
+  }
+
+  /* A recessed slot. Inputs are cut into the face, not laid on it. */
+  .slot {
+    font-family: var(--type-data);
+    font-size: 0.75rem;
+    color: var(--ink);
+    background: #aab0b6;
+    border: 1px solid rgba(0, 0, 0, 0.32);
+    border-radius: 1px;
+    padding: 0.35rem 0.5rem;
+    box-shadow:
+      inset 0 2px 3px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .slot:focus {
+    outline: 2px solid var(--brass-ink);
+    outline-offset: 1px;
+  }
+
+  /* A milled trough for code and canonical bytes. */
+  .trough {
+    background: var(--cut);
+    color: #c9d1d8;
+    border-radius: 2px;
+    padding: 0.75rem 0.85rem;
+    font-family: var(--type-data);
+    font-size: 0.6875rem;
+    line-height: 1.55;
+    overflow-x: auto;
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.55),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .trough-wrap {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  /* ------------------------------------------------------------------------
+     THE REGISTER. Tables read as a machinist's inspection sheet.
+     ------------------------------------------------------------------------ */
+
+  /* Every table lives inside one of these. The page never scrolls sideways. */
+  .scrollx {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  .register {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--type-data);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .register th {
+    text-align: left;
+    font-family: var(--type-plate);
+    font-weight: 600;
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--lip);
+    background: var(--cut);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.65);
+    padding: 0.3rem 0.6rem;
+    white-space: nowrap;
+  }
+
+  .register th:first-child {
+    border-radius: 1px 0 0 1px;
+  }
+
+  .register th:last-child {
+    border-radius: 0 1px 1px 0;
+  }
+
+  .register td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid rgba(45, 52, 58, 0.16);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  .register tbody tr:hover td {
+    background: rgba(45, 52, 58, 0.06);
+  }
+
+  /* A dimension line: label left, measured value right, with the gap between
+     them ruled the way a drawing rules one. */
+  .dim {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.85rem;
+  }
+
+  .dim > * {
+    min-width: 0;
+  }
+
+  .dim-ruled {
+    border-bottom: 1px solid rgba(45, 52, 58, 0.15);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+    padding-bottom: 0.3rem;
+  }
+
+  .dim .mono {
+    text-align: right;
+  }
+
+  .hollow {
+    border: 1px dashed rgba(45, 52, 58, 0.4);
+    border-radius: 2px;
+    padding: 1.35rem 1rem;
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 0.875rem;
+  }
 }
 
-.hash {
-  font-family: var(--font-ledger);
-  font-size: 0.6875rem;
-  word-break: break-all;
-  color: var(--color-intaglio-mid);
+/* ==========================================================================
+   MOTION. Three animations. Each one means something.
+   ========================================================================== */
+
+/* THE CURTAIN: a vault door parting. Two leaves that start closed across the
+   viewport and are driven apart on the screws. They are OFF-SCREEN at rest --
+   the transform below is the resting state, and the animation only ever moves
+   away from centre -- and the container never takes pointer events, so a
+   curtain can never swallow a click. */
+.vault {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-.label {
-  font-family: var(--font-ledger);
-  font-size: 0.5625rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-intaglio-faint);
+.vault-leaf {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 50.5%;
+  background-color: #aeb4ba;
+  background-image:
+    repeating-linear-gradient(
+      94deg,
+      rgba(255, 255, 255, 0.09) 0 1px,
+      rgba(0, 0, 0, 0.07) 1px 2px,
+      transparent 2px 4px
+    ),
+    linear-gradient(176deg, rgba(255, 255, 255, 0.14), rgba(0, 0, 0, 0.13));
+  pointer-events: none;
 }
 
-.figure {
-  font-family: var(--font-plate);
-  font-size: 2rem;
-  line-height: 1.05;
-  font-variant-numeric: tabular-nums lining-nums;
+.vault-leaf-left {
+  left: 0;
+  transform: translate3d(-101%, 0, 0);
+  border-right: 3px solid var(--brass);
+  box-shadow:
+    inset -7px 0 0 -4px rgba(255, 255, 255, 0.5),
+    6px 0 14px rgba(20, 25, 30, 0.35);
+  animation: vault-part-left 420ms cubic-bezier(0.62, 0.02, 0.34, 1) both;
 }
 
-/* --------------------------------------------------------------------------
-   Stamps. A verdict is stamped on the document, not printed in a table cell.
-   -------------------------------------------------------------------------- */
-
-.stamp {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-ledger);
-  font-size: 0.625rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  padding: 0.28rem 0.6rem;
-  border: 2px solid currentColor;
-  /* Rubber stamps are never quite square to the page. */
-  transform: rotate(-1.4deg);
+.vault-leaf-right {
+  right: 0;
+  transform: translate3d(101%, 0, 0);
+  border-left: 3px solid var(--brass);
+  box-shadow:
+    inset 7px 0 0 -4px rgba(255, 255, 255, 0.5),
+    -6px 0 14px rgba(20, 25, 30, 0.35);
+  animation: vault-part-right 420ms cubic-bezier(0.62, 0.02, 0.34, 1) both;
 }
 
-.stamp-valid {
-  color: var(--color-intaglio-mid);
+@keyframes vault-part-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  12% {
+    transform: translate3d(-1.2%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-101%, 0, 0);
+  }
 }
 
-.stamp-void {
-  color: var(--color-vermilion);
-  border-style: double;
-  border-width: 4px;
+@keyframes vault-part-right {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  12% {
+    transform: translate3d(1.2%, 0, 0);
+  }
+  100% {
+    transform: translate3d(101%, 0, 0);
+  }
 }
 
-.stamp-pending {
-  color: var(--color-ochre);
-  border-style: dashed;
-}
-
-.stamp-note {
-  color: var(--color-indigo-stamp);
-  border-width: 1px;
-  transform: none;
-}
-
-/* --------------------------------------------------------------------------
-   Motion. Two animations, both meaning something.
-   -------------------------------------------------------------------------- */
-
-/* An engraving plate inks from the centre outwards. Used once, on the rosette,
-   as a receipt's seal is drawn. */
-@keyframes ink {
+/* A disc is turned onto its seat. Used once, where a seal is drawn. */
+@keyframes seat {
   from {
     opacity: 0;
-    transform: scale(0.92) rotate(-6deg);
+    transform: rotate(-9deg) scale(0.94);
   }
   to {
     opacity: 1;
-    transform: scale(1) rotate(0deg);
+    transform: none;
   }
 }
 
-.ink-in {
-  animation: ink 520ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+.seated {
+  animation: seat 460ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
-/* A verification in progress moves a light across the plate, the way a note is
-   checked under a lamp. It runs only while a check is actually running. */
-@keyframes lamp {
+/* A part settles into the fixture. The stagger is set inline per row so a page
+   of forty does not animate as one block. */
+@keyframes settle-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.settling {
+  animation: settle-in 320ms ease both;
+}
+
+/* An inspection lamp traverses the part while a check is actually running. */
+@keyframes traverse {
   from {
     transform: translateX(-110%);
   }
@@ -259,90 +735,127 @@ body {
   }
 }
 
-.lamp::after {
+.inspecting::after {
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
-  width: 45%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in oklab, var(--color-ochre) 26%, transparent),
-    transparent
-  );
-  animation: lamp 1.15s ease-in-out infinite;
+  width: 42%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+  animation: traverse 1.15s ease-in-out infinite;
   pointer-events: none;
 }
 
-/* Rows arriving in the ledger settle in, one after another. The stagger is set
-   inline per row so a page of forty does not animate as one block. */
-@keyframes settle {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.settle {
-  animation: settle 340ms ease both;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .ink-in,
-  .settle {
-    animation: none !important;
+  .vault-leaf-left,
+  .vault-leaf-right,
+  .seated,
+  .settling {
+    animation: none;
   }
-  .lamp::after {
-    animation: none !important;
-    opacity: 0.3;
+
+  .inspecting::after {
+    animation: none;
+    opacity: 0.35;
   }
 }
 
-/* --------------------------------------------------------------------------
-   Tables read as a printed register.
-   -------------------------------------------------------------------------- */
+/* Legend swatches for the wheel pack. Same three inks as the drawing. */
+@layer components {
+  .wp-swatch {
+    display: inline-block;
+    width: 1.4rem;
+    height: 0.5rem;
+    border-radius: 1px;
+    vertical-align: -0.05rem;
+    margin-right: 0.15rem;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+  }
 
-.register {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-ledger);
-  font-size: 0.75rem;
+  .wp-gate {
+    background: var(--brass-lit);
+  }
+
+  .wp-sibling {
+    background: var(--brass);
+    opacity: 0.6;
+  }
+
+  .wp-promoted {
+    background: var(--oxide-fill);
+  }
 }
 
-.register th {
-  text-align: left;
-  font-weight: 400;
-  font-size: 0.5625rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-intaglio-faint);
-  padding: 0 0.6rem 0.4rem 0;
-  border-bottom: 1px solid var(--color-intaglio);
+/* Tree nodes in the Merkle listing: small milled chips, one per node. */
+@layer components {
+  .node {
+    display: inline-block;
+    font-family: var(--type-data);
+    font-size: 0.625rem;
+    line-height: 1.4;
+    padding: 0.15rem 0.35rem;
+    border-radius: 1px;
+    border: 1px solid rgba(45, 52, 58, 0.28);
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    overflow-wrap: anywhere;
+  }
+
+  .node-root {
+    border-color: rgba(50, 37, 8, 0.5);
+    background: var(--brass);
+    color: #191203;
+  }
+
+  .node-promoted {
+    border-color: rgba(50, 15, 6, 0.5);
+    background: var(--oxide-fill);
+    color: #ffdccd;
+  }
+
+  .node-more {
+    border-style: dashed;
+    background: transparent;
+    color: var(--ink-3);
+  }
 }
 
-.register td {
-  padding: 0.4rem 0.6rem 0.4rem 0;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-intaglio) 14%, transparent);
-  vertical-align: top;
-}
+/* The bench gauge, between the two discs, and an uncut blank. */
+@layer components {
+  .gauge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 50%;
+    font-family: var(--type-plate);
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: var(--cut);
+    box-shadow:
+      inset 0 2px 3px rgba(0, 0, 0, 0.55),
+      0 1px 0 rgba(255, 255, 255, 0.4);
+  }
 
-.register tbody tr:hover {
-  background: color-mix(in oklab, var(--color-intaglio) 5%, transparent);
-}
+  .gauge-idle {
+    color: #7d868f;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  .gauge-same {
+    color: var(--brass-lit);
+  }
 
-.underlink {
-  border-bottom: 1px solid color-mix(in oklab, var(--color-intaglio) 35%, transparent);
-}
+  .gauge-void {
+    color: var(--oxide-lit);
+  }
 
-.underlink:hover {
-  border-bottom-color: var(--color-vermilion);
+  .blank {
+    border-radius: 50%;
+    background: #b6bbc1;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.25),
+      0 1px 0 rgba(255, 255, 255, 0.4);
+    color: var(--ink-3);
+  }
 }

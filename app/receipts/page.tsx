@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { asc, desc } from "drizzle-orm";
+import { asc, count, desc, inArray } from "drizzle-orm";
 
 import { getDb } from "@/db/client";
 import { ensureBootstrapped } from "@/db/bootstrap";
 import { auditReceipts, merkleLeaves } from "@/db/schema";
 import { verifyChain } from "@/audit/ledger";
-import { Hash, Plate, Stamp } from "@/ui/plate";
+import { Hash, Plate, Tag } from "@/ui/plate";
 
 export const dynamic = "force-dynamic";
 
@@ -37,72 +37,95 @@ export default async function ReceiptsPage({
     .limit(pageSize)
     .offset(from);
 
-  const total = (await db.select({ id: auditReceipts.id }).from(auditReceipts)).length;
-  const anchored = new Set((await db.select().from(merkleLeaves)).map((l) => l.receiptId));
+  const [totalRow] = await db.select({ value: count() }).from(auditReceipts);
+  const total = totalRow?.value ?? 0;
+
+  // Anchoring is only read for the rows on this page, so the query asks about
+  // those receipts rather than pulling every leaf in every batch.
+  const pageIds = rows.map((row) => row.id);
+  const anchored = new Set(
+    pageIds.length === 0
+      ? []
+      : (
+          await db
+            .select({ receiptId: merkleLeaves.receiptId })
+            .from(merkleLeaves)
+            .where(inArray(merkleLeaves.receiptId, pageIds))
+        ).map((leaf) => leaf.receiptId),
+  );
+
   const chain = await verifyChain(db);
   const [latest] = await db.select().from(auditReceipts).orderBy(desc(auditReceipts.sequence)).limit(1);
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <p className="label">Append-only audit ledger</p>
-          <h1 className="text-2xl">{total} receipts, oldest first</h1>
-          <p className="mt-1 max-w-2xl text-sm text-[var(--color-intaglio-mid)]">
+          <h1 className="h-part mt-1">{total} receipts, oldest first</h1>
+          <p className="lede mt-2 max-w-2xl">
             Each row names the payload hash of the row above it. Remove one and every row below it stops
             linking. That is the only thing protecting the set; a signature protects one receipt, and nothing
             else protects the order.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Stamp kind={chain.intact ? "valid" : "void"}>
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
+          <Tag kind={chain.intact ? "valid" : "void"}>
             {chain.intact ? "Chain intact" : chain.brokenLinks.length + " broken links"}
-          </Stamp>
+          </Tag>
           <span className="label">head at sequence {latest?.sequence ?? 0}</span>
         </div>
       </div>
 
       <Plate>
-        <table className="register">
-          <thead>
-            <tr>
-              <th>Seq</th>
-              <th>Event</th>
-              <th>Payload hash</th>
-              <th>Links to</th>
-              <th>Anchored</th>
-              <th>Occurred</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
-              <tr key={row.id} className="settle" style={{ animationDelay: Math.min(i, 24) * 22 + "ms" }}>
-                <td className="text-[var(--color-intaglio-faint)]">{row.sequence}</td>
-                <td>
-                  <Link href={"/receipts/" + row.id} className="underlink">
-                    {row.eventType}
-                  </Link>
-                </td>
-                <td>
-                  <Hash value={row.payloadHash} />
-                </td>
-                <td>
-                  <Hash value={row.previousReceiptHash} chars={12} />
-                </td>
-                <td>
-                  {anchored.has(row.id) ? (
-                    <span className="text-[var(--color-intaglio-mid)]">yes</span>
-                  ) : (
-                    <span className="text-[var(--color-ochre)]">pending</span>
-                  )}
-                </td>
-                <td>{row.occurredAt.toISOString().slice(0, 16).replace("T", " ")}</td>
+        <div className="scrollx">
+          <table className="register">
+            <thead>
+              <tr>
+                <th>Seq</th>
+                <th>Event</th>
+                <th>Payload hash</th>
+                <th>Links to</th>
+                <th>Anchored</th>
+                <th>Occurred</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((row, i) => (
+                <tr
+                  key={row.id}
+                  className="settling"
+                  // The stagger is only worth its bytes on the rows a reader
+                  // actually sees arrive; the rest settle together.
+                  style={i < 12 ? { animationDelay: i * 22 + "ms" } : undefined}
+                >
+                  <td className="t-3">{row.sequence}</td>
+                  <td>
+                    <Link href={"/receipts/" + row.id} className="underlink">
+                      {row.eventType}
+                    </Link>
+                  </td>
+                  <td>
+                    <Hash value={row.payloadHash} />
+                  </td>
+                  <td>
+                    <Hash value={row.previousReceiptHash} chars={12} />
+                  </td>
+                  <td>
+                    {anchored.has(row.id) ? (
+                      <span className="t-brass">yes</span>
+                    ) : (
+                      <span className="t-3">pending</span>
+                    )}
+                  </td>
+                  <td>{row.occurredAt.toISOString().slice(0, 16).replace("T", " ")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-        <div className="mt-4 flex items-center justify-between">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <Link
             href={"/receipts?from=" + Math.max(0, from - pageSize)}
             aria-disabled={from === 0}

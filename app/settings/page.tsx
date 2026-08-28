@@ -4,7 +4,7 @@ import { environmentStatus } from "@/shared/env";
 import { listPublicKeys } from "@/crypto/keys";
 import { DEFAULT_RULES, POLICY_VERSION, rulesHash } from "@/policy/engine";
 import { PAYMENT_LABEL } from "@/payment/simulator";
-import { Plate, Stamp, inr } from "@/ui/plate";
+import { Dim, Plate, Tag, inr } from "@/ui/plate";
 
 export const dynamic = "force-dynamic";
 
@@ -16,30 +16,30 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-5">
-      <div>
+      <div className="min-w-0">
         <p className="label">Settings</p>
-        <h1 className="text-2xl">What this deployment is, exactly</h1>
+        <h1 className="h-part mt-1">What this deployment is, exactly</h1>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
         <Plate title="Environment">
           <div className="space-y-1.5">
-            <Row label="Mode" value={env.nodeEnv} />
-            <Row label="Payment mode" value={env.paymentMode} />
-            <Row label="Live money reachable" value={env.liveMoneyPossible ? "YES" : "no"} />
-            <Row label="Database driver" value={env.database.driver} />
-            <Row label="Database target" value={env.database.target} />
-            <Row label="Razorpay key id present" value={env.razorpay.keyIdPresent ? "yes" : "no"} />
-            <Row label="Razorpay secret present" value={env.razorpay.keySecretPresent ? "yes" : "no"} />
-            <Row label="Corpus seed" value={String(env.seed)} />
+            <Dim ruled label="Mode" value={env.nodeEnv} />
+            <Dim ruled label="Payment mode" value={env.paymentMode} />
+            <Dim ruled label="Live money reachable" value={env.liveMoneyPossible ? "YES" : "no"} />
+            <Dim ruled label="Database driver" value={env.database.driver} />
+            <Dim ruled label="Database target" value={env.database.target} />
+            <Dim ruled label="Razorpay key id present" value={env.razorpay.keyIdPresent ? "yes" : "no"} />
+            <Dim ruled label="Razorpay secret present" value={env.razorpay.keySecretPresent ? "yes" : "no"} />
+            <Dim ruled label="Corpus seed" value={String(env.seed)} />
           </div>
           <div className="mt-4">
-            <Stamp kind="note">{PAYMENT_LABEL}</Stamp>
+            <Tag kind="note">{PAYMENT_LABEL}</Tag>
           </div>
-          <p className="mt-3 text-xs text-[var(--color-intaglio-soft)]">
+          <p className="mt-3 text-xs t-2">
             No code path in this repository calls a Razorpay endpoint. The adapter interface exists; the
-            simulator is the only implementation of it. Secrets are reported as present or absent and are never
-            shown.
+            simulator is the only implementation of it. Secrets are reported as present or absent and are
+            never shown.
           </p>
         </Plate>
 
@@ -47,14 +47,14 @@ export default async function SettingsPage() {
           <Plate title="Signing keys">
             {keys.map((key) => (
               <div key={key.id} className="mb-4 space-y-1.5 last:mb-0">
-                <Row label="Id" value={key.id} />
-                <Row label="Algorithm" value={key.algorithm} />
-                <Row label="State" value={key.state} />
-                <Row label="Custody" value={key.custody} />
-                <p className="mt-2 text-xs text-[var(--color-vermilion)]">{key.label}</p>
+                <Dim ruled label="Id" value={key.id} />
+                <Dim ruled label="Algorithm" value={key.algorithm} />
+                <Dim ruled label="State" value={key.state} />
+                <Dim ruled label="Custody" value={key.custody} />
+                <p className="mt-2 text-xs t-void">{key.label}</p>
               </div>
             ))}
-            <p className="mt-3 text-xs text-[var(--color-intaglio-soft)]">
+            <p className="mt-3 text-xs t-2">
               Key generation is a deterministic function of a seed held in the environment. That is fine for a
               demonstration and catastrophic in production: whoever holds the seed holds the private key.
               Rotation would create a new key, mark it ACTIVE and retire the old one; historical receipts stay
@@ -64,27 +64,18 @@ export default async function SettingsPage() {
 
           <Plate title="Active policy">
             <div className="space-y-1.5">
-              <Row label="Version" value={POLICY_VERSION} />
-              <Row label="Rules hash" value={rulesHash(DEFAULT_RULES).slice(0, 24)} />
-              <Row label="Human review threshold" value={inr(DEFAULT_RULES.humanReviewThresholdMinor)} />
-              <Row label="Minimum intent confidence" value={DEFAULT_RULES.minimumIntentConfidence + "%"} />
+              <Dim ruled label="Version" value={POLICY_VERSION} />
+              <Dim ruled label="Rules hash" value={rulesHash(DEFAULT_RULES).slice(0, 24)} />
+              <Dim ruled label="Human review threshold" value={inr(DEFAULT_RULES.humanReviewThresholdMinor)} />
+              <Dim ruled label="Minimum intent confidence" value={DEFAULT_RULES.minimumIntentConfidence + "%"} />
             </div>
-            <p className="mt-3 text-xs text-[var(--color-intaglio-soft)]">
-              Both thresholds were tuned so the demonstration corpus produces a workable number of review cases.
-              Neither is derived from loss data, and a real deployment would set them from its own.
+            <p className="mt-3 text-xs t-2">
+              Both thresholds were tuned so the demonstration corpus produces a workable number of review
+              cases. Neither is derived from loss data, and a real deployment would set them from its own.
             </p>
           </Plate>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-[color-mix(in_oklab,var(--color-intaglio)_12%,transparent)] pb-1">
-      <span className="label">{label}</span>
-      <span className="mono">{value}</span>
     </div>
   );
 }
