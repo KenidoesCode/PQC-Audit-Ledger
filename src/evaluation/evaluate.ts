@@ -56,6 +56,8 @@ export interface EvaluationResult {
   /** Applied mutations. Ones that could not apply are excluded and counted. */
   mutationCount: number;
   mutationsNotApplicable: number;
+  /** Receipts actually mutated. Equals receiptCount unless bootstrap sampled. */
+  mutationReceiptsSampled: number;
   controlCount: number;
   tamperDetected: number;
   tamperMissed: number;
@@ -103,7 +105,26 @@ const REQUIRED_FOR_DENIED = ["ACTION_PROPOSED", "POLICY_EVALUATED", "PAYMENT_DEN
 
 export async function evaluate(
   db: Database,
-  options: { split: "development" | "held-out"; signLatenciesMs?: number[] },
+  options: {
+    split: "development" | "held-out";
+    signLatenciesMs?: number[];
+    /**
+     * How many receipts to MUTATE. Defaults to every one of them.
+     *
+     * Mutating a receipt costs one ML-DSA verify per mutation type, and the
+     * corpus produces roughly 1,430 applied mutations -- about seven seconds of
+     * pure signature verification. That is fine in a test or on an explicit
+     * POST to /api/evaluate; it is not fine inside a cold start, where it was
+     * more than half the time a first visitor waited.
+     *
+     * So bootstrap samples. The CONTROLS are never sampled -- every receipt is
+     * still verified untouched, because the false-verification rate is the
+     * number here that can actually fail and it costs one verify each rather
+     * than thirteen. Audit completeness and the chain walk are also unsampled.
+     * Only the tamper-detection denominator shrinks, and the page prints it.
+     */
+    mutationSample?: number;
+  },
 ): Promise<EvaluationResult> {
   const env = getEnv();
   const rng = new Rng(env.SEED + (options.split === "held-out" ? 7919 : 0));
@@ -117,12 +138,19 @@ export async function evaluate(
   const perType = new Map<MutationType, { attempted: number; applied: number; detected: number }>();
   for (const type of MUTATION_TYPES) perType.set(type, { attempted: 0, applied: 0, detected: 0 });
 
+  // Sampling is deterministic: the first N receipts in ledger order, not a
+  // random draw. A random sample would make two runs of the same corpus report
+  // different tamper-detection denominators, and a metric that moves on its own
+  // is one nobody can use to spot a regression.
+  const mutationTargets =
+    options.mutationSample === undefined ? receipts : receipts.slice(0, options.mutationSample);
+
   let mutationCount = 0;
   let mutationsNotApplicable = 0;
   let tamperDetected = 0;
   const verifyLatencies: number[] = [];
 
-  for (const row of receipts) {
+  for (const row of mutationTargets) {
     const body = row.body as unknown as ReceiptBody;
     const key = await loadPublicKey(db, row.signingKeyId);
 
@@ -278,6 +306,7 @@ export async function evaluate(
     receiptCount: receipts.length,
     mutationCount,
     mutationsNotApplicable,
+    mutationReceiptsSampled: mutationTargets.length,
     controlCount: receipts.length,
     tamperDetected,
     tamperMissed: mutationCount - tamperDetected,

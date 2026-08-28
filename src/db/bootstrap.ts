@@ -52,7 +52,17 @@ export async function ensureBootstrapped(): Promise<void> {
 
     const development = await generateCorpus(db, { split: "development", targetActions: 30 });
     await sealBatch(db);
-    await evaluate(db, { split: "development", signLatenciesMs: development.signLatenciesMs });
+    // Sampled, and only here. Mutating all 193 receipts costs ~1,430 ML-DSA
+    // verifies -- about seven seconds, which was over half of what a first
+    // visitor waited on a cold instance. Sixty receipts still produce several
+    // hundred applied mutations across every mutation type, and the evaluation
+    // page prints how many receipts were sampled so the denominator is never
+    // mistaken for the whole corpus. POST /api/evaluate runs the full sweep.
+    await evaluate(db, {
+      split: "development",
+      signLatenciesMs: development.signLatenciesMs,
+      mutationSample: 60,
+    });
 
     logger.info("bootstrap_complete", {
       durationMs: Date.now() - started,

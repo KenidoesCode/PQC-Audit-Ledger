@@ -69,6 +69,14 @@ export default async function EvaluationPage() {
             failing case is not already ruled out by SHA-256.
           </p>
           <p>
+            <strong>
+              {m.mutationReceiptsSampled < m.receiptCount
+                ? m.mutationReceiptsSampled + " of " + m.receiptCount + " receipts were mutated on this run."
+                : "Every receipt was mutated on this run."}
+            </strong>{" "}
+            {m.mutationReceiptsSampled < m.receiptCount
+              ? "Mutating all of them costs about 1,430 signature verifications, which is more than half of a cold start, so the run that populates this page samples. POST /api/evaluate runs the full sweep. "
+              : ""}
             <strong>{m.mutationsNotApplicable} mutations could not be applied</strong> and are excluded rather
             than scored — a receipt with no payment id cannot have its payment id changed, and counting that
             as an undetected tamper would quietly lower the denominator in our favour.
