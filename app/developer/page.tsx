@@ -85,7 +85,7 @@ export default async function DeveloperPage() {
         </div>
       </Plate>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="pair-grid">
         <Plate title="Canonicalization, in full">
           <ol className="list-inside list-decimal space-y-1.5 text-sm">
             <li>Object keys sorted by UTF-16 code unit, ascending.</li>

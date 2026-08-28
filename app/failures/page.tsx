@@ -36,7 +36,7 @@ export default async function FailuresPage() {
         </p>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="pair-grid">
         <Plate title={"Policy denials (" + denied.length + ")"}>
           {denied.length === 0 ? (
             <p className="text-sm">Nothing was denied.</p>

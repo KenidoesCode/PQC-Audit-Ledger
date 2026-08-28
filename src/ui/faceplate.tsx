@@ -35,7 +35,10 @@ export function Faceplate() {
         <Link href="/overview" className="faceplate-mark mr-3 shrink-0">
           PQC Audit Ledger
         </Link>
-        <nav aria-label="Sections" className="flex min-w-0 flex-wrap gap-x-5 gap-y-1">
+        {/* Layout lives in .faceplate-nav, not in utilities: below 720px the
+            rail becomes one horizontally scrolling strip, and a flex-wrap
+            utility would sit in a later cascade layer and win. */}
+        <nav aria-label="Sections" className="faceplate-nav">
           {SECTIONS.map((section) => (
             <Link
               key={section.href}

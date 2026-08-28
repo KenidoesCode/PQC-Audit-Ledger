@@ -859,3 +859,187 @@
     color: var(--ink-3);
   }
 }
+
+/* ==========================================================================
+   RESPONSIVE LAYER
+   ==========================================================================
+   The machine was drawn for one width. This section makes it a continuous
+   function of the viewport instead of a ladder of breakpoints: clamp() and
+   auto-fit, so the layout is considered at 361px and 917px and not only at the
+   four widths somebody happened to test.
+
+   WHY THIS BLOCK IS UNLAYERED. Everything above sits in @layer base and
+   @layer components. Tailwind's utilities sit in a LATER layer, so a layered
+   rule loses to px-6 or flex-wrap no matter how specific it is. The gutter,
+   the panel padding and the nav strip below are the rules most likely to be
+   silently overridden that way, so they are declared outside every layer,
+   where they beat any utility. The corresponding utilities have also been
+   removed from the elements themselves -- belt and braces, because a gutter
+   that quietly stays fixed is exactly the failure this section exists to fix.
+
+   The existing @media (max-width: 900px) rule for .seam is still the only
+   query at that width. Rather than adding a second one, the two layouts that
+   use .seam now switch to a row at min-[901px] so the divider flips from a
+   right edge to a bottom edge at the same moment the parts stop sitting side
+   by side.
+   ========================================================================== */
+
+/* 1. The document does not scroll sideways. Designated containers -- .scrollx,
+      .trough, the nav strip -- still do. */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+/* 2. Body text. 15px on a laptop as before; 14px on a 360px phone, where the
+      measure is 28 characters and the extra pixel costs a line per paragraph. */
+body {
+  font-size: clamp(0.875rem, 0.83rem + 0.2vw, 0.9375rem);
+}
+
+/* 3. THE PAGE GUTTER. Was a fixed px-6 (1.5rem), which spends 8% of a 360px
+      screen on nothing. Now 4vw between a 14px floor and the original 24px, so
+      the gutter is the same on a laptop and gives back 20px on a phone.
+      .faceplate-inner takes the identical padding-inline so the plant name on
+      the rail lines up with the first character of the page under it. */
+.page {
+  max-width: 1500px;
+  margin-inline: auto;
+  padding-inline: clamp(0.875rem, 4vw, 1.5rem);
+  padding-block: clamp(1rem, 2.6vw, 1.75rem);
+}
+
+.faceplate-inner {
+  padding-inline: clamp(0.875rem, 4vw, 1.5rem);
+}
+
+/* 4. The big number. Was a fixed 1.95rem, which breaks a rupee figure across
+      two lines on a phone. */
+.figure {
+  font-size: clamp(1.25rem, 1.05rem + 2.05vw, 1.95rem);
+}
+
+/* 5. Panel padding. Was a fixed 1.15rem/1.25rem; at 360px that is 40px of the
+      viewport spent on the inside of a bevel. */
+.plate {
+  padding: clamp(0.7rem, 2.2vw, 1.15rem) clamp(0.7rem, 2.6vw, 1.25rem);
+}
+
+/* 6. THE SIGNATURE ELEMENTS. The wheel pack already draws at width:100% with a
+      viewBox and a max-width, which is the correct pattern. The milled disc
+      carried fixed width/height attributes, so it could not give way if its
+      column ever got narrower than the part. It now scales with its container
+      and keeps its aspect ratio from the viewBox. Neither one can force the
+      page wide. */
+.disc {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 7. CARD GRIDS. These jumped from one column straight to three, four and five
+      at lg, which left the 768-1024px band -- tablets, half-screen windows --
+      as a single tall column. auto-fit makes the column count a function of the
+      available width instead. min(100%, …) is load-bearing: without it a single
+      card is wider than a 360px viewport and pushes the document sideways. */
+.card-grid,
+.pair-grid,
+.figure-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+/* Panels carrying a figure and a sentence. 1 up to ~500px, 2 through the
+   tablet band, 3-4 on a laptop. */
+.card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+/* Two panels of prose or dimension rows. 2 up from ~760px rather than 1024. */
+.pair-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+}
+
+/* Bare figures. The floor is 10rem so a rupee amount at the fluid display size
+   still fits its cell at 360px, where this stays one column as it does today. */
+.figure-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+}
+
+/* 8. THE NAV. Ten section names wrapped into three or four rails pushes the
+      first screen of content below the fold. Below the threshold the index
+      marks become one horizontally scrolling strip on its own rail, with the
+      plant name and the simulated-money tag on the rail above it. The tag is
+      not an ornament -- it is the standing disclaimer that no live money is
+      reachable -- so it is kept and set smaller rather than hidden.
+
+      WHY 1280px AND NOT 720px. Measured against the type rather than guessed:
+      the ten marks need about 840px at 0.75rem with 0.14em tracking and a
+      1.4rem gap, the plant name about 170px and the tag about 210px, so one
+      shared rail needs a viewport of roughly 1290px. Below that the flex
+      container was wrapping the header into three rails at 1024px and four at
+      768px -- the whole first screen pushed down on exactly the widths this
+      pass is about. The strip therefore starts at 1280px, which is where the
+      estimate says the single rail actually runs out, and it comfortably
+      contains the 720px the requirement asks for.
+
+      That estimate is an advance-width model, not a measurement in a browser,
+      so it could be out by a tenth either way. It errs on the safe side: if the
+      single rail would in fact have fitted at 1200px, the cost is a deliberate
+      two-rail header there rather than a one-rail one, which is a different
+      composition and not a broken one.
+
+      The marks do not actually scroll until about 890px, because
+      overflow-x: auto only produces a scroller when there is something to
+      scroll -- so a tablet gets one tidy rail of ten names, and a phone gets
+      the strip. */
+.faceplate-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  min-width: 0;
+}
+
+@media (max-width: 1280px) {
+  .faceplate-inner {
+    gap: 0.3rem 0.75rem;
+    padding-bottom: 0.4rem;
+  }
+
+  .faceplate-nav {
+    order: 3;
+    /* 100% basis in a wrapping flex row is what puts the strip on its own line. */
+    flex: 1 0 100%;
+    flex-wrap: nowrap;
+    gap: 0 1.05rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 2px;
+  }
+
+  .faceplate-nav::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  .faceplate-nav > a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 560px) {
+  .faceplate-mark {
+    letter-spacing: 0.12em;
+  }
+
+  .faceplate-inner > .tag {
+    font-size: 0.5625rem;
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0.45rem;
+  }
+}

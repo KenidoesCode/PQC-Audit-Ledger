@@ -84,7 +84,7 @@ export default async function EvaluationPage() {
         </div>
       </Plate>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="card-grid">
         <Plate>
           <Figure value={(m.tamperDetectionRate * 100).toFixed(1) + "%"} caption="tamper detection" />
           <p className="mt-2 text-xs t-2">
@@ -117,7 +117,7 @@ export default async function EvaluationPage() {
         </Plate>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="pair-grid">
         <Plate title="Per mutation type">
           <div className="scrollx">
             <table className="register">

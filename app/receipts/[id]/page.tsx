@@ -48,8 +48,8 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
 
       {/* The part itself: seal on the left, the record on the right. */}
       <section className="plate">
-        <div className="flex flex-col gap-6 md:flex-row">
-          <div className="seam flex shrink-0 flex-col items-center md:w-[210px]">
+        <div className="flex flex-col gap-6 min-[901px]:flex-row">
+          <div className="seam flex shrink-0 flex-col items-center min-[901px]:w-[210px]">
             <MilledDisc
               hash={row.payloadHash}
               size={168}
@@ -94,7 +94,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
         </div>
       </section>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="pair-grid">
         <Plate title="What this receipt binds">
           <dl className="space-y-1.5">
             {Object.entries(body.references).map(([key, value]) => (

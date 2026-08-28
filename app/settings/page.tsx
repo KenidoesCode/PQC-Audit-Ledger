@@ -21,7 +21,7 @@ export default async function SettingsPage() {
         <h1 className="h-part mt-1">What this deployment is, exactly</h1>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="pair-grid">
         <Plate title="Environment">
           <div className="space-y-1.5">
             <Dim ruled label="Mode" value={env.nodeEnv} />

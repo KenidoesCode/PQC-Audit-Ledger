@@ -136,7 +136,10 @@ export function MilledDisc({ hash, size = 132, tone = "brass", className }: Disc
       width={size}
       height={size}
       viewBox={"0 0 " + size + " " + size}
-      className={className}
+      /* .disc is max-width:100%; height:auto -- the attributes above are the
+         part's nominal size, and the viewBox lets it give way if the column it
+         sits in is ever narrower than that. */
+      className={"disc " + (className ?? "")}
       role="img"
       aria-label={
         "Disc milled from payload hash " +

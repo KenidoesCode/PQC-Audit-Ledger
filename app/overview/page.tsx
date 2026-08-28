@@ -47,7 +47,7 @@ export default async function OverviewPage() {
       {/* right, jointed along a machined seam.                              */}
       {/* ------------------------------------------------------------------ */}
       <section className="plate">
-        <div className="flex flex-col gap-6 md:flex-row md:items-start">
+        <div className="flex flex-col gap-6 min-[901px]:flex-row min-[901px]:items-start">
           <div className="seam flex shrink-0 flex-col items-center">
             {genesis ? (
               <MilledDisc hash={genesis.payloadHash} size={152} className="seated" />
@@ -70,7 +70,7 @@ export default async function OverviewPage() {
               will not imply otherwise.
             </p>
 
-            <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="figure-grid mt-5">
               <Figure value={String(receiptTotal?.value ?? 0)} caption="receipts in the ledger" />
               <Figure value={String(actions.length)} caption="agent actions" />
               <Figure value={inr(settled)} caption="simulated value settled" />
@@ -114,7 +114,7 @@ export default async function OverviewPage() {
         </div>
       </Plate>
 
-      <div className="grid gap-5 lg:grid-cols-3">
+      <div className="card-grid">
         <Plate title="Decisions">
           <div className="space-y-3">
             <Dim ruled label="Allowed" value={String(actions.length - denied.length - review.length)} />
@@ -178,7 +178,7 @@ export default async function OverviewPage() {
             </Link>
           }
         >
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="figure-grid">
             <Figure value={fmtPct(metrics.tamperDetectionRate)} caption="tamper detection" />
             <Figure
               value={fmtPct(metrics.falseVerificationRate)}
