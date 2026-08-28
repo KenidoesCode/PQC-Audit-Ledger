@@ -6,6 +6,7 @@ import { sealBatch } from "../audit/ledger";
 import { generateCorpus } from "../evaluation/corpus";
 import { evaluate } from "../evaluation/evaluate";
 import { getEnv } from "../shared/env";
+import { withDeterministicIds } from "../shared/ids";
 import { logger } from "../shared/logger";
 
 /**
@@ -26,7 +27,14 @@ let bootstrapped: Promise<void> | null = null;
 export async function ensureBootstrapped(): Promise<void> {
   if (bootstrapped) return bootstrapped;
 
-  bootstrapped = (async () => {
+  // The whole cold-start path runs under deterministic ids -- corpus
+  // generation, Merkle sealing and the evaluation run alike -- because on this
+  // deployment the page renderer and the API routes are separate serverless
+  // functions, each seeding its own in-process pglite. Ids minted from the
+  // clock made those two corpora disjoint, so a receipt id from the API 404d on
+  // the page tier. See the long note in shared/ids.ts. Nothing outside this
+  // block is affected: ids minted by live requests are still clock-and-random.
+  bootstrapped = withDeterministicIds(async () => {
     const env = getEnv();
     const started = Date.now();
 
@@ -51,7 +59,7 @@ export async function ensureBootstrapped(): Promise<void> {
       receipts: development.receipts,
       inMemory: env.pgliteInMemory,
     });
-  })().catch((error: unknown) => {
+  }).catch((error: unknown) => {
     // A failed bootstrap must not be cached as success, or every later request
     // would see an empty ledger with no explanation.
     bootstrapped = null;
