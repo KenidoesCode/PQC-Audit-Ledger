@@ -7,7 +7,7 @@ import { receiptCanonicalString, type ReceiptBody } from "@/audit/receipt";
 import { CANONICALIZATION } from "@/crypto/canonical";
 import { MERKLE_ALGORITHM } from "@/crypto/merkle";
 import { HASH_ALGORITHM } from "@/crypto/hash";
-import { Plate } from "@/ui/plate";
+import { Panel } from "@/ui/panel";
 
 export const dynamic = "force-dynamic";
 
@@ -68,10 +68,10 @@ export default async function DeveloperPage() {
     <div className="space-y-5">
       <div className="min-w-0">
         <p className="label">Developer</p>
-        <h1 className="h-part mt-1">Everything this system does is reachable over HTTP</h1>
+        <h1 className="title mt-1">Everything this system does is reachable over HTTP</h1>
       </div>
 
-      <Plate title="Endpoints">
+      <Panel title="Endpoints">
         <div className="space-y-3">
           {ENDPOINTS.map((endpoint) => (
             <div key={endpoint.path} className="border-l-2 border-[rgba(45,52,58,0.32)] pl-3">
@@ -83,10 +83,10 @@ export default async function DeveloperPage() {
             </div>
           ))}
         </div>
-      </Plate>
+      </Panel>
 
       <div className="pair-grid">
-        <Plate title="Canonicalization, in full">
+        <Panel title="Canonicalization, in full">
           <ol className="list-inside list-decimal space-y-1.5 text-sm">
             <li>Object keys sorted by UTF-16 code unit, ascending.</li>
             <li>No insignificant whitespace.</li>
@@ -105,9 +105,9 @@ export default async function DeveloperPage() {
             implicit, because the only real defence against a canonicalizer bug is somebody else implementing
             these rules from the description and getting the same bytes.
           </p>
-        </Plate>
+        </Panel>
 
-        <Plate title="Merkle rules, in full">
+        <Panel title="Merkle rules, in full">
           <ul className="space-y-1.5 text-sm">
             <li>
               <strong>Leaf:</strong> SHA-256(0x00 || receipt payload hash). Not the receipt id.
@@ -133,19 +133,19 @@ export default async function DeveloperPage() {
             </li>
           </ul>
           <p className="mt-3 text-xs t-2">{MERKLE_ALGORITHM}</p>
-        </Plate>
+        </Panel>
       </div>
 
-      <Plate title="A receipt, canonicalized">
+      <Panel title="A receipt, canonicalized">
         <p className="mb-2 text-xs t-2">
           {HASH_ALGORITHM} over exactly these bytes is the payload hash. ML-DSA-65 over exactly these bytes is
           the signature.
         </p>
-        <pre className="trough trough-wrap max-h-[20rem] overflow-auto">{canonical}</pre>
-      </Plate>
+        <pre className="term term-wrap max-h-[20rem] overflow-auto">{canonical}</pre>
+      </Panel>
 
-      <Plate title="Running the offline verifier">
-        <pre className="trough">
+      <Panel title="Running the offline verifier">
+        <pre className="term">
           {`# download the evidence and the checker
 curl -O https://<this-host>/api/bundle
 curl -O https://<this-host>/ledger-verify.mjs
@@ -157,7 +157,7 @@ node ledger-verify.mjs audit-bundle.json --json   # machine output
 # prove the bundle's key is not privileged: every receipt must fail
 node ledger-verify.mjs audit-bundle.json --key 0f0f0f...`}
         </pre>
-      </Plate>
+      </Panel>
     </div>
   );
 }

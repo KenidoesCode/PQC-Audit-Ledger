@@ -32,7 +32,7 @@
  * Server-rendered SVG. No client JavaScript.
  */
 
-interface WheelPackProps {
+interface MerkleRingsProps {
   /** Every level of the real tree, leaves first, root last. */
   levels: string[][];
   /** The leaf whose proof path is being shown as the gates. */
@@ -51,7 +51,7 @@ function arc(c: number, r: number, from: number, to: number): string {
   return "M" + pt(c, r, from) + "A" + r.toFixed(2) + " " + r.toFixed(2) + " 0 " + large + " 1 " + pt(c, r, to);
 }
 
-export function WheelPack({ levels, proofIndex, size = 340 }: WheelPackProps) {
+export function MerkleRings({ levels, proofIndex, size = 340 }: MerkleRingsProps) {
   const c = size / 2;
   const count = levels.length;
   const rOuter = c - 8;
@@ -120,7 +120,7 @@ export function WheelPack({ levels, proofIndex, size = 340 }: WheelPackProps) {
               y1={c}
               x2={c + rOuter + 4}
               y2={c}
-              stroke="var(--brass)"
+              stroke="var(--lume)"
               strokeWidth={1}
               opacity={0.45}
               strokeDasharray="3 3"
@@ -133,28 +133,28 @@ export function WheelPack({ levels, proofIndex, size = 340 }: WheelPackProps) {
                   cy={c}
                   r={Number(ring.r.toFixed(2))}
                   fill="none"
-                  stroke="var(--cut)"
+                  stroke="var(--well)"
                   strokeWidth={thickness}
                   strokeDasharray={ring.solid ? undefined : ring.dash}
                   opacity={0.85}
                 />
                 {ring.sibling && (
-                  <path d={ring.sibling} fill="none" stroke="var(--brass)" strokeWidth={thickness} opacity={0.6} />
+                  <path d={ring.sibling} fill="none" stroke="var(--lume)" strokeWidth={thickness} opacity={0.6} />
                 )}
                 {ring.promotedArc && (
-                  <path d={ring.promotedArc} fill="none" stroke="var(--oxide-fill)" strokeWidth={thickness} />
+                  <path d={ring.promotedArc} fill="none" stroke="var(--clu)" strokeWidth={thickness} />
                 )}
-                <path d={ring.gate} fill="none" stroke="var(--brass-lit)" strokeWidth={thickness} />
+                <path d={ring.gate} fill="none" stroke="var(--lume-hot)" strokeWidth={thickness} />
               </g>
             ))}
 
-            {/* The root, seated at the centre of the pack. */}
+            {/* The root, lock at the centre of the pack. */}
             <circle
               cx={c}
               cy={c}
               r={Number((rInner * 0.55).toFixed(2))}
-              fill="var(--brass)"
-              stroke="var(--cut)"
+              fill="var(--lume)"
+              stroke="var(--well)"
               strokeWidth={1.5}
             />
           </g>
@@ -167,14 +167,14 @@ export function WheelPack({ levels, proofIndex, size = 340 }: WheelPackProps) {
           into one sector per node at that level.
         </p>
         <p>
-          <span className="wp-swatch wp-gate" /> the gates — leaf {proofIndex} and every node it folds into.
+          <span className="ring-swatch ring-gate" /> the gates — leaf {proofIndex} and every node it folds into.
           They line up on one radius because a node at index j folds into the parent at floor(j/2), and that
           alignment is the proof.{" "}
-          <span className="wp-swatch wp-sibling" /> the siblings the proof actually carries.
+          <span className="ring-swatch ring-sibling" /> the siblings the proof actually carries.
         </p>
         {promotedLevels.length > 0 && (
           <p>
-            <span className="wp-swatch wp-promoted" /> promoted odd nodes, at level
+            <span className="ring-swatch ring-promoted" /> promoted odd nodes, at level
             {promotedLevels.length === 1 ? " " : "s "}
             {promotedLevels.join(", ")} — carried up unchanged rather than hashed against a duplicate of
             themselves.

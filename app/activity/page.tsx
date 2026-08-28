@@ -5,7 +5,7 @@ import { getDb } from "@/db/client";
 import { ensureBootstrapped } from "@/db/bootstrap";
 import { agentActions, intents } from "@/db/schema";
 import { AgentBench } from "@/ui/agent-bench";
-import { Plate, inr } from "@/ui/plate";
+import { Panel, inr } from "@/ui/panel";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +25,7 @@ export default async function ActivityPage() {
     <div className="space-y-5">
       <div className="min-w-0">
         <p className="label">Live agent activity</p>
-        <h1 className="h-part mt-1">Give the agent an instruction and watch what stops it</h1>
+        <h1 className="title mt-1">Give the agent an instruction and watch what stops it</h1>
         <p className="lede mt-2 max-w-3xl">
           The agent parses. It does not decide. Everything after the proposal is deterministic code the agent
           cannot reach, which is the only way the sentence &ldquo;the AI cannot exceed its authority&rdquo; means
@@ -33,11 +33,11 @@ export default async function ActivityPage() {
         </p>
       </div>
 
-      <Plate title="Bench">
+      <Panel title="Bench">
         <AgentBench />
-      </Plate>
+      </Panel>
 
-      <Plate title="Recent actions">
+      <Panel title="Recent actions">
         <div className="scrollx">
           <table className="register">
             <thead>
@@ -52,10 +52,10 @@ export default async function ActivityPage() {
             </thead>
             <tbody>
               {actions.map((action, i) => (
-                <tr key={action.id} className="settling" style={{ animationDelay: Math.min(i, 20) * 20 + "ms" }}>
+                <tr key={action.id} className="rez" style={{ animationDelay: Math.min(i, 20) * 20 + "ms" }}>
                   <td
                     className={
-                      action.decision === "DENIED" ? "t-void" : action.decision === "HUMAN_REVIEW" ? "t-brass" : ""
+                      action.decision === "DENIED" ? "t-void" : action.decision === "HUMAN_REVIEW" ? "t-lume" : ""
                     }
                   >
                     {action.decision}
@@ -77,7 +77,7 @@ export default async function ActivityPage() {
           </Link>{" "}
           to follow one.
         </p>
-      </Plate>
+      </Panel>
     </div>
   );
 }

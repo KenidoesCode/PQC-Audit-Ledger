@@ -9,7 +9,7 @@ import { CANONICALIZATION } from "@/crypto/canonical";
 import { HASH_ALGORITHM } from "@/crypto/hash";
 import { MERKLE_ALGORITHM } from "@/crypto/merkle";
 import { SUITE } from "@/crypto/mldsa";
-import { Dim, Plate, Tag } from "@/ui/plate";
+import { Dim, Panel, Tag } from "@/ui/panel";
 import { DemoRunner } from "@/ui/demo-runner";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +27,7 @@ export default async function VerifierPage() {
     <div className="space-y-5">
       <div className="min-w-0">
         <p className="label">Independent verification</p>
-        <h1 className="h-part mt-1">Check this ledger without trusting this ledger</h1>
+        <h1 className="title mt-1">Check this ledger without trusting this ledger</h1>
         <p className="lede mt-2 max-w-3xl">
           Download the bundle, download the verifier, run it offline. It makes no network calls and opens no
           database — it reads a file and decides. If it and this website ever disagree about a receipt, believe
@@ -35,12 +35,12 @@ export default async function VerifierPage() {
         </p>
       </div>
 
-      <Plate title="Take the evidence with you">
+      <Panel title="Take the evidence with you">
         <div className="flex flex-wrap gap-3">
-          <a href="/api/bundle" className="key key-brass">
+          <a href="/api/bundle" className="key key-lume">
             Download audit bundle
           </a>
-          <a href="/ledger-verify.mjs" download className="key key-brass">
+          <a href="/ledger-verify.mjs" download className="key key-lume">
             Download ledger-verify.mjs
           </a>
         </div>
@@ -51,11 +51,11 @@ export default async function VerifierPage() {
           about. Defending against that needs a second implementation by someone else, which is why the
           canonicalization rules are written out in full in the source.
         </p>
-      </Plate>
+      </Panel>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <Plate title="Three commands">
-          <pre className="trough">
+        <Panel title="Three commands">
+          <pre className="term">
 {`curl -O https://<this-host>/api/bundle
 curl -O https://<this-host>/ledger-verify.mjs
 node ledger-verify.mjs audit-bundle.json`}
@@ -69,17 +69,17 @@ node ledger-verify.mjs audit-bundle.json`}
           <p className="mt-3 text-sm">
             To prove the bundle&apos;s own key is not privileged, hand it a different one:
           </p>
-          <pre className="trough mt-2">
+          <pre className="term mt-2">
 {`node ledger-verify.mjs audit-bundle.json --key $(printf '0f%.0s' {1..1952})`}
           </pre>
           <p className="lede mt-2 text-sm">
             Every receipt must fail. If any survives a wrong key, the signature is not bound to the key and
             nothing else on this site is worth reading.
           </p>
-        </Plate>
+        </Panel>
 
         <div className="space-y-5">
-          <Plate title="Suite">
+          <Panel title="Suite">
             <div className="space-y-1.5">
               <Dim label="Signature" value={SUITE.algorithm} />
               <Dim label="Standard" value={SUITE.standard} />
@@ -91,9 +91,9 @@ node ledger-verify.mjs audit-bundle.json`}
               <Dim label="Canonicalization" value={CANONICALIZATION.name} />
               <Dim label="Merkle" value={MERKLE_ALGORITHM} />
             </div>
-          </Plate>
+          </Panel>
 
-          <Plate title="This ledger">
+          <Panel title="This ledger">
             <div className="space-y-1.5">
               <Dim label="Receipts" value={String(chain.receiptCount)} />
               <Dim label="First sequence" value={String(first?.sequence ?? 0)} />
@@ -104,9 +104,9 @@ node ledger-verify.mjs audit-bundle.json`}
             <div className="mt-3">
               <Tag kind={chain.intact ? "valid" : "void"}>{chain.intact ? "Chain intact" : "Chain broken"}</Tag>
             </div>
-          </Plate>
+          </Panel>
 
-          <Plate title="Public keys">
+          <Panel title="Public keys">
             {keys.map((key) => (
               <div key={key.id} className="mb-3 min-w-0 last:mb-0">
                 <p className="mono">{key.id}</p>
@@ -116,15 +116,15 @@ node ledger-verify.mjs audit-bundle.json`}
                 <p className="hash mt-1">{key.publicKey.slice(0, 64)}…</p>
               </div>
             ))}
-          </Plate>
+          </Panel>
         </div>
       </div>
 
-      <Plate title="The five demonstrations">
+      <Panel title="The five demonstrations">
         <DemoRunner />
-      </Plate>
+      </Panel>
 
-      <Plate title="What a valid signature does and does not prove">
+      <Panel title="What a valid signature does and does not prove">
         <div className="grid gap-5 md:grid-cols-2">
           <div className="min-w-0">
             <p className="label mb-2">It proves</p>
@@ -151,7 +151,7 @@ node ledger-verify.mjs audit-bundle.json`}
             </p>
           </div>
         </div>
-      </Plate>
+      </Panel>
     </div>
   );
 }

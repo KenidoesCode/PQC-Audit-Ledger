@@ -127,7 +127,7 @@ export function AgentBench() {
           type="button"
           onClick={() => void submit()}
           disabled={busy || text.trim().length === 0}
-          className={"key " + (busy ? "inspecting relative overflow-hidden" : "")}
+          className={"key " + (busy ? "scanning relative overflow-hidden" : "")}
         >
           {busy ? "Running" : "Run the flow"}
         </button>
@@ -144,14 +144,14 @@ export function AgentBench() {
           {log.map((entry) => (
             <li
               key={entry.actionId}
-              className="settling border-l-2 pl-3"
+              className="rez border-l-2 pl-3"
               style={{
                 borderColor:
                   entry.decision === "ALLOWED"
-                    ? "var(--brass)"
+                    ? "var(--lume)"
                     : entry.decision === "DENIED"
-                      ? "var(--oxide-fill)"
-                      : "var(--brass-lit)",
+                      ? "var(--clu)"
+                      : "var(--lume-hot)",
               }}
             >
               <div className="flex flex-wrap items-baseline gap-3">
@@ -162,7 +162,7 @@ export function AgentBench() {
                       ? ""
                       : entry.decision === "DENIED"
                         ? "t-void"
-                        : "t-brass")
+                        : "t-lume")
                   }
                 >
                   {entry.decision}

@@ -4,7 +4,7 @@ import { environmentStatus } from "@/shared/env";
 import { listPublicKeys } from "@/crypto/keys";
 import { DEFAULT_RULES, POLICY_VERSION, rulesHash } from "@/policy/engine";
 import { PAYMENT_LABEL } from "@/payment/simulator";
-import { Dim, Plate, Tag, inr } from "@/ui/plate";
+import { Dim, Panel, Tag, inr } from "@/ui/panel";
 
 export const dynamic = "force-dynamic";
 
@@ -18,11 +18,11 @@ export default async function SettingsPage() {
     <div className="space-y-5">
       <div className="min-w-0">
         <p className="label">Settings</p>
-        <h1 className="h-part mt-1">What this deployment is, exactly</h1>
+        <h1 className="title mt-1">What this deployment is, exactly</h1>
       </div>
 
       <div className="pair-grid">
-        <Plate title="Environment">
+        <Panel title="Environment">
           <div className="space-y-1.5">
             <Dim ruled label="Mode" value={env.nodeEnv} />
             <Dim ruled label="Payment mode" value={env.paymentMode} />
@@ -41,10 +41,10 @@ export default async function SettingsPage() {
             simulator is the only implementation of it. Secrets are reported as present or absent and are
             never shown.
           </p>
-        </Plate>
+        </Panel>
 
         <div className="space-y-5">
-          <Plate title="Signing keys">
+          <Panel title="Signing keys">
             {keys.map((key) => (
               <div key={key.id} className="mb-4 space-y-1.5 last:mb-0">
                 <Dim ruled label="Id" value={key.id} />
@@ -60,9 +60,9 @@ export default async function SettingsPage() {
               Rotation would create a new key, mark it ACTIVE and retire the old one; historical receipts stay
               verifiable because each one names the key that signed it.
             </p>
-          </Plate>
+          </Panel>
 
-          <Plate title="Active policy">
+          <Panel title="Active policy">
             <div className="space-y-1.5">
               <Dim ruled label="Version" value={POLICY_VERSION} />
               <Dim ruled label="Rules hash" value={rulesHash(DEFAULT_RULES).slice(0, 24)} />
@@ -73,7 +73,7 @@ export default async function SettingsPage() {
               Both thresholds were tuned so the demonstration corpus produces a workable number of review
               cases. Neither is derived from loss data, and a real deployment would set them from its own.
             </p>
-          </Plate>
+          </Panel>
         </div>
       </div>
     </div>

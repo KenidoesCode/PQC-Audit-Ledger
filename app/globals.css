@@ -1,80 +1,90 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   MACHINED STEEL
+   THE GRID
    ==========================================================================
    WHY THIS VISUAL LANGUAGE, FOR THIS PRODUCT
 
-   This product is a vault. Its entire reason to exist is that a stranger can
-   check a receipt without trusting whoever issued it. The physical objects
-   humanity has built for that job -- safe doors, combination wheel packs,
-   machined seals, calibrated gauges -- share one property: their security is
-   geometric and it is visible on the face of the object. You do not take a
-   locksmith's word for a wheel pack. You look at where the gates line up.
+   This product's claim is that cryptographic structure can be checked rather
+   than believed. A Merkle tree is not a metaphor here: it is a lattice, every
+   node folds into exactly one parent, and a proof is the run of nodes that
+   lights up from a leaf to the root. That is a circuit. It either closes or it
+   does not.
 
-   That is the argument for steel here. A Merkle tree is a mechanism, not an
-   ornament: nodes fold in pairs, an odd node is promoted, a proof is the small
-   set of siblings that make the root come out. Mechanism is what machined metal
-   depicts natively. Engraved security printing (the previous treatment) argued
-   the same idea with ornament -- a rosette is hard to counterfeit but it does
-   not show you HOW it resists. A milled disc does: the cuts are at measurable
-   radii and you can see two discs disagree.
+   So the site is drawn as a circuit that closes. Black ground with a cold blue
+   cast, one hairline lattice over everything, and light as the only material.
+   Nothing here is lit by a lamp above it -- every visible edge is emitting.
+   Panels are cut out of the dark by a single bright rule and four corner
+   brackets; a heading is a filament; a verdict is the colour of the light.
 
-   So: a brushed steel ground under a lit room, cool and grey, never a dark UI.
-   Panels are raised machined faces with a real bevel. Every panel carries a
-   milled nameplate channel -- a recess cut into the face with light characters
-   sitting in it, which is what "deep-engraved" means when the light comes from
-   above. Two accents and no more: machined brass-bronze for a seal that holds,
-   oxide red for one that does not. Brass and oxide are the only saturated
-   colour on the site, so a broken thing is visible from across a room.
+   TWO COLOURS OF LIGHT AND NO MORE.
+     lume (cyan)   a program that checks out -- a valid signature, an intact
+                   chain, a proof that reproduces the root.
+     clu  (amber)  one that does not. Denials, voids, broken links, the
+                   development-key warning.
+   Nothing else on the site is saturated, so a broken thing is visible from
+   across a room. Cyan and amber are also the only two allegiances on the Grid,
+   which is the reason they were chosen and not a coincidence.
 
    WHERE THE BOLDNESS IS SPENT
-   ui/disc.tsx      -- the milled disc. Every turning mark, sector cut and index
-                       notch is read out of the receipt's payload hash. Two
-                       receipts mill the same disc only if they have the same
-                       hash. A tampered receipt mills visibly wrong, and the
-                       tamper bench sets the two discs side by side so the
-                       difference is seen before any hex is read.
-   ui/wheel-pack.tsx-- the Merkle batch as a combination wheel pack. One ring
-                       per level of the real tree, divided into the real node
-                       count, with the proof path drawn as the gates that line
-                       up and the promoted odd nodes marked on the rim.
+   ui/grid-intro.tsx -- the landing. A perspective Grid floor under a Merkle
+                        lattice; light traces run the tree upward as you
+                        scroll, and the root seals with a pulse. Canvas, no
+                        assets, no third-party request.
+   ui/disc.tsx       -- the identity disc. Every ring, arc segment and index
+                        mark is read out of the receipt's payload hash. On the
+                        Grid a disc carries a program's complete record; here
+                        it carries a receipt's. Two receipts rez the same disc
+                        only if they have the same hash, so a tampered receipt
+                        is a visibly different object beside the original --
+                        before a hex character has been read.
+   ui/rings.tsx      -- the Merkle batch as concentric rings, one per level of
+                        the real tree, divided into the real node count, with
+                        the proof path lit along one radius.
+   ui/derez.tsx      -- the page transition. A light-cycle ribbon crosses the
+                        viewport and the old page derezzes behind it.
 
-   Everything else is kept quiet on purpose.
+   THE DATA STAYS READABLE. Tables, hashes and figures are high-contrast and
+   unglowing. A number never gets a bloom that costs it a stroke.
    ========================================================================== */
 
 :root {
-  /* Engraved characters: dark, cut into a lit face. */
-  --ink: #1e2328;
-  --ink-2: #333a41;
-  --ink-3: #3c444b;
+  /* The ground. Black with enough blue in it to read as cold rather than dead. */
+  --void: #04070c;
+  --panel: #070c13;
+  --panel-2: #0a121b;
+  --well: #020407;
 
-  /* The metal. Ground is the brushed plate the whole machine sits on; face is
-     a raised, separately-turned part; cut is the floor of a milled recess. */
-  --steel: #b2b8be;
-  --face: #c2c7cc;
-  --cut: #2f353b;
-  --cut-2: #3b424a;
-  --lip: #dfe3e6;
-  --edge: #7e868e;
+  /* Rules. Everything structural is one of these three weights of hairline. */
+  --rule: rgba(125, 213, 255, 0.13);
+  --rule-2: rgba(125, 213, 255, 0.26);
+  --rule-3: rgba(125, 213, 255, 0.5);
 
-  /* A seal that holds. */
-  --brass: #9c7a24;
-  --brass-lit: #d9b45e;
-  --brass-ink: #57400a;
+  /* A program that checks out. */
+  --lume: #7ce8ff;
+  --lume-hot: #dcfaff;
+  --lume-dim: #3e8ea6;
 
-  /* A seal that does not. */
-  --oxide: #7e2913;
-  --oxide-fill: #9a3418;
-  --oxide-lit: #d1653f;
+  /* One that does not. */
+  --clu: #ffa63c;
+  --clu-hot: #ffd7a0;
+  --clu-dim: #a86a20;
 
-  /* Bahnschrift is Windows' shipped DIN -- the lettering standard for machine
-     plates and instrument faces. It is already on the machine; nothing is
-     downloaded. The fallbacks are the nearest condensed grotesques per system. */
-  --type-plate: "Bahnschrift", "DIN Alternate", "Avenir Next Condensed",
-    "HelveticaNeue-CondensedBold", "Arial Narrow", system-ui, sans-serif;
+  /* Type. */
+  --text: #b9d2df;
+  --text-hi: #e6f6fd;
+  --text-2: #8fa9b8;
+  --text-3: #6d8695;
+
+  /* A geometric face for anything set in caps -- circular bowls and open
+     counters are what the Grid's lettering does, and the fallbacks are the
+     nearest geometric sans on each system. Prose stays on the UI face: a
+     geometric at 15px costs a reader more than the costume is worth. */
+  --type-display: "Century Gothic", "Futura", "Avenir Next", "URW Gothic", "Segoe UI",
+    system-ui, sans-serif;
   --type-body: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-  --type-data: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, Menlo, monospace;
+  --type-data: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, "Liberation Mono",
+    monospace;
 }
 
 @layer base {
@@ -85,39 +95,59 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    background-color: var(--void);
   }
 
   body {
     margin: 0;
-    color: var(--ink);
+    color: var(--text);
     font-family: var(--type-body);
     font-size: 15px;
-    line-height: 1.55;
-    background-color: var(--steel);
-    /* The grain. Two passes: a fine directional brush a few degrees off the
-       horizontal, and a slow top-to-bottom fall of light across the plate. A
-       flat grey div is a div; grain is what makes it metal. */
+    line-height: 1.6;
+    background-color: var(--void);
+  }
+
+  /* THE LATTICE. One fixed layer under everything, masked so it fades out at
+     the edges instead of tiling to the corners like a spreadsheet. Fixed and
+     not attached to the body background, so scrolling repaints nothing. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
     background-image:
-      repeating-linear-gradient(
-        94deg,
-        rgba(255, 255, 255, 0.075) 0 1px,
-        rgba(0, 0, 0, 0.045) 1px 2px,
-        transparent 2px 4px
-      ),
-      linear-gradient(176deg, rgba(255, 255, 255, 0.11), rgba(0, 0, 0, 0.08));
+      linear-gradient(rgba(125, 213, 255, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(125, 213, 255, 0.055) 1px, transparent 1px);
+    background-size:
+      100% 46px,
+      46px 100%;
+    -webkit-mask-image: radial-gradient(115% 80% at 50% 0%, #000 20%, transparent 82%);
+    mask-image: radial-gradient(115% 80% at 50% 0%, #000 20%, transparent 82%);
+  }
+
+  /* The horizon glow the lattice recedes into. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(90% 46% at 50% -8%, rgba(60, 170, 210, 0.16), transparent 70%);
   }
 
   h1,
   h2,
   h3 {
-    font-family: var(--type-plate);
+    font-family: var(--type-display);
     font-weight: 600;
-    letter-spacing: 0.005em;
+    letter-spacing: 0.01em;
     line-height: 1.14;
     margin: 0;
-    /* Deep-engraved: the glyph is the cut, and the light from above catches its
-       lower wall. One pixel, no glow. */
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.42);
+    color: var(--text-hi);
+    /* A filament, not a blur: the glyph keeps its own edge and the bloom sits
+       outside it. */
+    text-shadow: 0 0 22px rgba(124, 232, 255, 0.3);
   }
 
   a {
@@ -126,154 +156,198 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--brass-ink);
+    outline: 2px solid var(--lume);
     outline-offset: 2px;
   }
 
   ::selection {
-    background: var(--brass-lit);
-    color: var(--cut);
+    background: rgba(124, 232, 255, 0.28);
+    color: var(--lume-hot);
   }
 }
 
 @layer components {
   /* ------------------------------------------------------------------------
-     THE FACEPLATE. Navigation is the machine's front panel: one gunmetal rail
-     with the plant name struck into it and the sections indexed along it.
+     THE RAIL. Navigation is a beam across the top of the Grid: the system name
+     struck at one end, the sections along it, and the one you are standing in
+     lit. Sticky, because the ledger tables are long and losing the way out of
+     a 300-row table is a real cost.
      ------------------------------------------------------------------------ */
 
-  .faceplate {
-    background: var(--cut);
-    background-image: repeating-linear-gradient(
-      94deg,
-      rgba(255, 255, 255, 0.05) 0 1px,
-      rgba(0, 0, 0, 0.16) 1px 2px,
-      transparent 2px 4px
-    );
-    box-shadow:
-      inset 0 -1px 0 rgba(0, 0, 0, 0.6),
-      0 1px 0 rgba(255, 255, 255, 0.4),
-      0 2px 5px rgba(20, 25, 30, 0.28);
+  .rail {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: linear-gradient(180deg, rgba(4, 7, 12, 0.97), rgba(4, 7, 12, 0.88));
+    border-bottom: 1px solid var(--rule-2);
+    box-shadow: 0 1px 22px rgba(124, 232, 255, 0.09);
   }
 
-  .faceplate-inner {
+  .rail-inner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.25rem 1.4rem;
     max-width: 1500px;
     margin: 0 auto;
-    padding: 0.6rem 1.5rem 0.5rem;
+    padding-block: 0.6rem 0.5rem;
   }
 
-  .faceplate-mark {
-    font-family: var(--type-plate);
+  .rail-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--type-display);
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--lip);
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.7);
+    color: var(--lume-hot);
+    text-shadow: 0 0 16px rgba(124, 232, 255, 0.55);
   }
 
-  /* Section names are index marks along the rail. The one you are on gets a
-     brass notch cut under it -- the same notch language as the discs. */
-  .index-mark {
+  /* The mark carries the disc glyph: a lit ring with a gap, which is the one
+     shape on the Grid that means "a record you can hand to someone". */
+  .rail-mark::before {
+    content: "";
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    border: 2px solid var(--lume);
+    border-right-color: transparent;
+    box-shadow: 0 0 10px rgba(124, 232, 255, 0.8);
+  }
+
+  .rail-link {
     position: relative;
     display: inline-block;
-    font-family: var(--type-plate);
+    font-family: var(--type-display);
     font-size: 0.75rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #9aa3ac;
-    padding-bottom: 5px;
-    transition: color 120ms linear;
+    color: var(--text-3);
+    padding-bottom: 6px;
+    transition:
+      color 140ms linear,
+      text-shadow 140ms linear;
   }
 
-  .index-mark::after {
+  .rail-link::after {
     content: "";
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 2px;
+    height: 1px;
     background: transparent;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 200ms cubic-bezier(0.2, 0.7, 0.3, 1);
   }
 
-  .index-mark:hover {
-    color: var(--lip);
+  .rail-link:hover {
+    color: var(--text-hi);
   }
 
-  .index-mark[aria-current="page"] {
-    color: var(--brass-lit);
+  .rail-link:hover::after {
+    background: var(--rule-3);
+    transform: scaleX(1);
   }
 
-  .index-mark[aria-current="page"]::after {
-    background: var(--brass);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.55);
+  .rail-link[aria-current="page"] {
+    color: var(--lume-hot);
+    text-shadow: 0 0 14px rgba(124, 232, 255, 0.6);
+  }
+
+  .rail-link[aria-current="page"]::after {
+    background: var(--lume);
+    transform: scaleX(1);
+    box-shadow: 0 0 9px rgba(124, 232, 255, 0.9);
   }
 
   /* ------------------------------------------------------------------------
-     PARTS. Every panel is a raised, separately machined face.
+     PANELS. A panel is a rectangle cut out of the dark by one bright rule and
+     four corner brackets. There is no fill worth speaking of -- the edge is
+     the object.
      ------------------------------------------------------------------------ */
 
-  .plate {
+  .panel {
     position: relative;
-    border: 1px solid rgba(40, 47, 54, 0.34);
-    border-radius: 2px;
-    background-color: var(--face);
-    background-image: repeating-linear-gradient(
-      94deg,
-      rgba(255, 255, 255, 0.05) 0 1px,
-      rgba(0, 0, 0, 0.028) 1px 2px,
-      transparent 2px 5px
-    );
-    box-shadow:
-      inset 0 1px 0 var(--lip),
-      inset 1px 0 0 rgba(255, 255, 255, 0.26),
-      inset -1px 0 0 rgba(0, 0, 0, 0.1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-      0 1px 2px rgba(20, 25, 30, 0.2);
+    border: 1px solid var(--rule);
+    background:
+      linear-gradient(180deg, rgba(124, 232, 255, 0.035), transparent 42%),
+      var(--panel);
     padding: 1.15rem 1.25rem;
+    box-shadow:
+      inset 0 1px 0 rgba(124, 232, 255, 0.11),
+      0 0 0 1px rgba(0, 0, 0, 0.4);
   }
 
-  /* The nameplate channel: a recess milled across the top of the part with the
-     part's name in it. Light characters, dark recess -- literally. */
-  .plate-title {
+  /* The brackets. Two pseudo-elements, opposite corners, one hairline each. */
+  .panel::before,
+  .panel::after {
+    content: "";
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    pointer-events: none;
+  }
+
+  .panel::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid var(--lume);
+    border-left: 1px solid var(--lume);
+  }
+
+  .panel::after {
+    right: -1px;
+    bottom: -1px;
+    border-right: 1px solid var(--lume);
+    border-bottom: 1px solid var(--lume);
+  }
+
+  /* The panel's name, on a bar cut across the top with a lit tick at the left
+     and a rule that runs out to the edge. */
+  .panel-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
     flex-wrap: wrap;
-    margin: -0.35rem -0.45rem 0.85rem;
-    padding: 0.3rem 0.6rem;
-    border-radius: 1px;
-    background: var(--cut);
-    color: var(--lip);
-    font-family: var(--type-plate);
+    margin: -0.35rem -0.45rem 0.9rem;
+    padding: 0.35rem 0.6rem 0.35rem 0.85rem;
+    background: linear-gradient(90deg, rgba(124, 232, 255, 0.1), transparent 78%);
+    border-bottom: 1px solid var(--rule);
+    color: var(--lume-hot);
+    font-family: var(--type-display);
     font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.17em;
+    letter-spacing: 0.19em;
     text-transform: uppercase;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.7);
-    box-shadow:
-      inset 0 2px 3px rgba(0, 0, 0, 0.5),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.2);
   }
 
-  .plate-title a {
-    color: var(--brass-lit);
+  .panel-title::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    width: 2px;
+    height: 0.85rem;
+    background: var(--lume);
+    box-shadow: 0 0 8px rgba(124, 232, 255, 0.9);
   }
 
-  .plate-title a:hover {
-    color: #f0d492;
+  .panel-title a {
+    color: var(--lume);
   }
 
-  /* A machined seam: where two parts are jointed, one edge in shadow and the
-     next in light. Replaces the old torn perforation. */
+  .panel-title a:hover {
+    color: var(--lume-hot);
+  }
+
+  /* Where two parts of one panel are jointed: a lit seam, not a gutter. */
   .seam {
-    border-right: 1px solid rgba(0, 0, 0, 0.28);
-    box-shadow: 1px 0 0 rgba(255, 255, 255, 0.42);
+    border-right: 1px solid var(--rule);
     padding-right: 1.25rem;
     margin-right: 1.25rem;
   }
@@ -281,8 +355,7 @@
   @media (max-width: 900px) {
     .seam {
       border-right: none;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.28);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.42);
+      border-bottom: 1px solid var(--rule);
       padding-right: 0;
       margin-right: 0;
       padding-bottom: 1rem;
@@ -294,17 +367,18 @@
      TYPE ROLES
      ------------------------------------------------------------------------ */
 
-  .h-part {
-    font-family: var(--type-plate);
+  .title {
+    font-family: var(--type-display);
     font-weight: 600;
-    font-size: clamp(1.5rem, 1.05rem + 1.5vw, 2rem);
+    font-size: clamp(1.5rem, 1.05rem + 1.5vw, 2.1rem);
     line-height: 1.12;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.42);
+    color: var(--text-hi);
+    text-shadow: 0 0 26px rgba(124, 232, 255, 0.28);
   }
 
   .lede {
     font-size: 0.9375rem;
-    color: var(--ink-2);
+    color: var(--text-2);
   }
 
   .mono {
@@ -320,97 +394,107 @@
     font-family: var(--type-data);
     font-size: 0.6875rem;
     line-height: 1.5;
-    color: var(--ink-2);
+    color: var(--text-2);
     overflow-wrap: anywhere;
     word-break: break-word;
     font-variant-numeric: tabular-nums;
   }
 
-  .label {
-    font-family: var(--type-plate);
+  .label,
+  .scene-kicker {
+    font-family: var(--type-display);
     font-size: 0.625rem;
     font-weight: 600;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--ink-3);
+    color: var(--text-3);
   }
 
+  .scene-kicker {
+    color: var(--lume);
+    letter-spacing: 0.32em;
+    font-size: 0.6875rem;
+    text-shadow: 0 0 14px rgba(124, 232, 255, 0.5);
+  }
+
+  /* The hero number. Lit, but the glyph keeps its own edge. */
   .figure {
-    font-family: var(--type-plate);
+    font-family: var(--type-display);
     font-weight: 600;
     font-size: 1.95rem;
     line-height: 1.05;
+    color: var(--lume-hot);
     font-variant-numeric: tabular-nums lining-nums;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    text-shadow: 0 0 20px rgba(124, 232, 255, 0.4);
   }
 
   .t-2 {
-    color: var(--ink-2);
+    color: var(--text-2);
   }
 
   .t-3 {
-    color: var(--ink-3);
+    color: var(--text-3);
   }
 
   .t-void {
-    color: var(--oxide);
+    color: var(--clu);
   }
 
-  .t-brass {
-    color: var(--brass-ink);
+  .t-lume {
+    color: var(--lume);
   }
 
   .underlink {
-    border-bottom: 1px solid rgba(45, 52, 58, 0.35);
+    border-bottom: 1px solid var(--rule-2);
+    transition: border-color 140ms linear;
   }
 
   .underlink:hover {
-    border-bottom-color: var(--oxide-fill);
+    color: var(--lume-hot);
+    border-bottom-color: var(--lume);
   }
 
   /* ------------------------------------------------------------------------
-     TAGS. A verdict is struck into a metal tag and bolted on, dead square --
-     machined parts are not stamped at an angle.
+     TAGS. A verdict is a bracketed chip. The bracket is drawn, not typed, so it
+     stays put when the label wraps.
      ------------------------------------------------------------------------ */
 
   .tag {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-family: var(--type-plate);
+    font-family: var(--type-display);
     font-size: 0.6875rem;
     font-weight: 600;
     letter-spacing: 0.13em;
     text-transform: uppercase;
     padding: 0.25rem 0.6rem;
-    border-radius: 1px;
-    border: 1px solid rgba(0, 0, 0, 0.35);
-    background: var(--cut);
-    color: var(--lip);
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.65);
-    box-shadow:
-      inset 0 1px 2px rgba(0, 0, 0, 0.45),
-      0 1px 0 rgba(255, 255, 255, 0.35);
+    border: 1px solid var(--rule-2);
+    background: rgba(124, 232, 255, 0.05);
+    color: var(--text-2);
   }
 
   .tag-valid {
-    color: var(--brass-lit);
+    color: var(--lume-hot);
+    border-color: rgba(124, 232, 255, 0.55);
+    background: rgba(124, 232, 255, 0.1);
+    box-shadow: 0 0 14px rgba(124, 232, 255, 0.22);
   }
 
   .tag-void {
-    background: var(--oxide-fill);
-    color: #ffdccd;
-    border-color: rgba(0, 0, 0, 0.45);
+    color: var(--clu-hot);
+    border-color: rgba(255, 166, 60, 0.55);
+    background: rgba(255, 166, 60, 0.1);
+    box-shadow: 0 0 14px rgba(255, 166, 60, 0.2);
   }
 
   .tag-pending {
-    color: #e2c98f;
-    background: var(--cut-2);
+    color: var(--clu);
+    border-color: rgba(255, 166, 60, 0.34);
   }
 
   .tag-note {
-    color: #b9c2cb;
-    background: var(--cut-2);
+    color: var(--text-2);
   }
 
   /* ------------------------------------------------------------------------
@@ -418,119 +502,121 @@
      ------------------------------------------------------------------------ */
 
   .key {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-family: var(--type-plate);
+    font-family: var(--type-display);
     font-size: 0.6875rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--ink);
-    padding: 0.45rem 0.85rem;
-    border-radius: 2px;
-    border: 1px solid rgba(40, 47, 54, 0.4);
-    background: linear-gradient(180deg, #d3d8dc, #b6bcc2);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.75),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.22),
-      0 1px 2px rgba(20, 25, 30, 0.25);
+    color: var(--text-hi);
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--rule-2);
+    background: rgba(124, 232, 255, 0.04);
     cursor: pointer;
-    transition: background 100ms linear;
+    overflow: hidden;
+    transition:
+      color 140ms linear,
+      border-color 140ms linear,
+      box-shadow 140ms linear,
+      background-color 140ms linear;
   }
 
   .key:hover:not(:disabled) {
-    background: linear-gradient(180deg, #dde2e5, #bfc5cb);
+    color: var(--lume-hot);
+    border-color: var(--lume);
+    background-color: rgba(124, 232, 255, 0.11);
+    box-shadow: 0 0 18px rgba(124, 232, 255, 0.3);
   }
 
   .key:active:not(:disabled) {
-    background: linear-gradient(180deg, #b0b6bc, #c6cbd0);
-    box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.35);
+    background-color: rgba(124, 232, 255, 0.2);
+    box-shadow: 0 0 6px rgba(124, 232, 255, 0.4);
   }
 
   .key:disabled {
-    opacity: 0.5;
+    opacity: 0.42;
     cursor: default;
   }
 
-  /* Brass-faced. Reserved for taking the evidence away: the audit bundle and
-     the offline verifier are the point of the whole project. */
-  .key-brass {
-    color: #22190a;
-    border-color: rgba(50, 37, 8, 0.55);
-    background: linear-gradient(180deg, #e0bd6c, #9c7a24);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 245, 210, 0.7),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-      0 1px 3px rgba(20, 25, 30, 0.3);
+  /* Lit-faced. Reserved for taking the evidence away: the audit bundle and the
+     offline verifier are the point of the whole project. */
+  .key-lume {
+    color: #01161c;
+    border-color: var(--lume);
+    background: linear-gradient(180deg, var(--lume-hot), var(--lume));
+    box-shadow: 0 0 22px rgba(124, 232, 255, 0.4);
     padding: 0.6rem 1.05rem;
     font-size: 0.75rem;
   }
 
-  .key-brass:hover:not(:disabled) {
-    background: linear-gradient(180deg, #ecca7d, #a9852a);
-  }
-
-  .key-brass:active:not(:disabled) {
-    background: linear-gradient(180deg, #8f7020, #c8a24a);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45);
+  .key-lume:hover:not(:disabled) {
+    color: #01161c;
+    background: linear-gradient(180deg, #ffffff, var(--lume-hot));
+    box-shadow: 0 0 30px rgba(124, 232, 255, 0.65);
   }
 
   .key-void {
-    color: #fff0e9;
-    border-color: rgba(50, 15, 6, 0.55);
-    background: linear-gradient(180deg, #b04326, #7e2913);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 210, 190, 0.45),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-      0 1px 2px rgba(20, 25, 30, 0.3);
+    color: var(--clu-hot);
+    border-color: rgba(255, 166, 60, 0.6);
+    background: rgba(255, 166, 60, 0.09);
   }
 
   .key-void:hover:not(:disabled) {
-    background: linear-gradient(180deg, #bd4b2c, #8b2e15);
+    color: #1a0d02;
+    border-color: var(--clu);
+    background-color: var(--clu);
+    box-shadow: 0 0 20px rgba(255, 166, 60, 0.45);
   }
 
-  /* A recessed slot. Inputs are cut into the face, not laid on it. */
+  /* A field is a slot cut into the dark with a lit floor. */
   .slot {
     font-family: var(--type-data);
     font-size: 0.75rem;
-    color: var(--ink);
-    background: #aab0b6;
-    border: 1px solid rgba(0, 0, 0, 0.32);
-    border-radius: 1px;
-    padding: 0.35rem 0.5rem;
-    box-shadow:
-      inset 0 2px 3px rgba(0, 0, 0, 0.3),
-      0 1px 0 rgba(255, 255, 255, 0.4);
+    color: var(--text-hi);
+    background: var(--well);
+    border: 1px solid var(--rule-2);
+    border-bottom-color: var(--rule-3);
+    padding: 0.4rem 0.55rem;
+    transition:
+      border-color 140ms linear,
+      box-shadow 140ms linear;
+  }
+
+  .slot:hover {
+    border-color: var(--rule-3);
   }
 
   .slot:focus {
-    outline: 2px solid var(--brass-ink);
-    outline-offset: 1px;
+    outline: none;
+    border-color: var(--lume);
+    box-shadow: 0 0 0 1px var(--lume), 0 0 18px rgba(124, 232, 255, 0.3);
   }
 
-  /* A milled trough for code and canonical bytes. */
-  .trough {
-    background: var(--cut);
-    color: #c9d1d8;
-    border-radius: 2px;
-    padding: 0.75rem 0.85rem;
+  /* A terminal: canonical bytes, commands, the things that are read literally. */
+  .term {
+    position: relative;
+    background: var(--well);
+    color: var(--lume-hot);
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--lume);
+    padding: 0.8rem 0.9rem;
     font-family: var(--type-data);
     font-size: 0.6875rem;
-    line-height: 1.55;
+    line-height: 1.6;
     overflow-x: auto;
-    box-shadow:
-      inset 0 2px 4px rgba(0, 0, 0, 0.55),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.14);
   }
 
-  .trough-wrap {
+  .term-wrap {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
 
   /* ------------------------------------------------------------------------
-     THE REGISTER. Tables read as a machinist's inspection sheet.
+     THE REGISTER. Tables are the one place the costume stops. No glow, no
+     tint, tabular figures, maximum contrast.
      ------------------------------------------------------------------------ */
 
   /* Every table lives inside one of these. The page never scrolls sideways. */
@@ -545,44 +631,43 @@
     font-family: var(--type-data);
     font-size: 0.75rem;
     font-variant-numeric: tabular-nums lining-nums;
+    color: var(--text);
   }
 
   .register th {
     text-align: left;
-    font-family: var(--type-plate);
+    font-family: var(--type-display);
     font-weight: 600;
     font-size: 0.625rem;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--lip);
-    background: var(--cut);
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.65);
-    padding: 0.3rem 0.6rem;
+    color: var(--lume);
+    background: rgba(124, 232, 255, 0.07);
+    border-bottom: 1px solid var(--rule-2);
+    padding: 0.4rem 0.6rem;
     white-space: nowrap;
   }
 
-  .register th:first-child {
-    border-radius: 1px 0 0 1px;
-  }
-
-  .register th:last-child {
-    border-radius: 0 1px 1px 0;
-  }
-
   .register td {
-    padding: 0.4rem 0.6rem;
-    border-bottom: 1px solid rgba(45, 52, 58, 0.16);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid rgba(125, 213, 255, 0.08);
     vertical-align: top;
     overflow-wrap: anywhere;
   }
 
-  .register tbody tr:hover td {
-    background: rgba(45, 52, 58, 0.06);
+  /* Hover lights the row's leading edge rather than washing the cells, so the
+     text underneath keeps every bit of its contrast. */
+  .register tbody tr {
+    box-shadow: inset 2px 0 0 transparent;
+    transition: box-shadow 120ms linear, background-color 120ms linear;
   }
 
-  /* A dimension line: label left, measured value right, with the gap between
-     them ruled the way a drawing rules one. */
+  .register tbody tr:hover {
+    background-color: rgba(124, 232, 255, 0.045);
+    box-shadow: inset 2px 0 0 var(--lume);
+  }
+
+  /* A readout row: label left, measured value right. */
   .dim {
     display: flex;
     align-items: baseline;
@@ -595,35 +680,274 @@
   }
 
   .dim-ruled {
-    border-bottom: 1px solid rgba(45, 52, 58, 0.15);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
-    padding-bottom: 0.3rem;
+    border-bottom: 1px solid rgba(125, 213, 255, 0.09);
+    padding-bottom: 0.32rem;
   }
 
   .dim .mono {
     text-align: right;
+    color: var(--text-hi);
   }
 
+  /* Empty state. Not an apology -- a slot with nothing rezzed in it. */
   .hollow {
-    border: 1px dashed rgba(45, 52, 58, 0.4);
-    border-radius: 2px;
-    padding: 1.35rem 1rem;
+    border: 1px dashed var(--rule-2);
+    padding: 1.5rem 1rem;
     text-align: center;
-    color: var(--ink-3);
+    color: var(--text-3);
     font-size: 0.875rem;
+    background: repeating-linear-gradient(
+      -45deg,
+      rgba(124, 232, 255, 0.03) 0 6px,
+      transparent 6px 12px
+    );
+  }
+
+  /* Legend swatches for the Merkle rings. Same three lights as the drawing. */
+  .ring-swatch {
+    display: inline-block;
+    width: 1.4rem;
+    height: 0.4rem;
+    vertical-align: 0.05rem;
+    margin-right: 0.15rem;
+  }
+
+  .ring-gate {
+    background: var(--lume-hot);
+    box-shadow: 0 0 8px rgba(124, 232, 255, 0.8);
+  }
+
+  .ring-sibling {
+    background: var(--lume-dim);
+  }
+
+  .ring-promoted {
+    background: var(--clu);
+  }
+
+  /* Tree nodes in the Merkle listing: one lit cell per node. */
+  .node {
+    display: inline-block;
+    font-family: var(--type-data);
+    font-size: 0.625rem;
+    line-height: 1.4;
+    padding: 0.15rem 0.35rem;
+    border: 1px solid var(--rule);
+    background: rgba(124, 232, 255, 0.04);
+    color: var(--text-2);
+    overflow-wrap: anywhere;
+  }
+
+  .node-root {
+    border-color: var(--lume);
+    background: rgba(124, 232, 255, 0.16);
+    color: var(--lume-hot);
+    box-shadow: 0 0 12px rgba(124, 232, 255, 0.35);
+  }
+
+  .node-promoted {
+    border-color: rgba(255, 166, 60, 0.6);
+    background: rgba(255, 166, 60, 0.12);
+    color: var(--clu-hot);
+  }
+
+  .node-more {
+    border-style: dashed;
+    background: transparent;
+    color: var(--text-3);
+  }
+
+  /* The comparator between the two discs on the tamper bench, and the slot an
+     uncut disc has not rezzed into yet. */
+  .gauge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    border: 1px solid var(--rule-2);
+    font-family: var(--type-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: var(--well);
+  }
+
+  .gauge-idle {
+    color: var(--text-3);
+  }
+
+  .gauge-same {
+    color: var(--lume-hot);
+    border-color: var(--lume);
+    box-shadow: 0 0 16px rgba(124, 232, 255, 0.4);
+  }
+
+  .gauge-void {
+    color: var(--clu-hot);
+    border-color: var(--clu);
+    box-shadow: 0 0 16px rgba(255, 166, 60, 0.4);
+  }
+
+  .unrezzed {
+    border-radius: 50%;
+    border: 1px dashed var(--rule-2);
+    background: var(--well);
+    color: var(--text-3);
   }
 }
 
 /* ==========================================================================
-   MOTION. Three animations. Each one means something.
+   THE LANDING
+   ==========================================================================
+   Four scenes over four screens of scroll, with one canvas fixed behind them.
+   The canvas is the Grid floor and the Merkle lattice; the DOM is the words.
+   Nothing here writes to the DOM per frame -- the scenes are toggled by an
+   IntersectionObserver and animated by CSS transitions.
    ========================================================================== */
 
-/* THE CURTAIN: a vault door parting. Two leaves that start closed across the
-   viewport and are driven apart on the screws. They are OFF-SCREEN at rest --
-   the transform below is the resting state, and the animation only ever moves
-   away from centre -- and the container never takes pointer events, so a
-   curtain can never swallow a click. */
-.vault {
+.bleed {
+  position: relative;
+}
+
+.grid-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* The landing's own header: no rail, just the mark and the way in. */
+.intro-head {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem clamp(0.875rem, 4vw, 2rem);
+}
+
+.scene {
+  position: relative;
+  z-index: 10;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding: 5rem clamp(0.875rem, 4vw, 2rem) 4rem;
+}
+
+.scene-body {
+  max-width: 46rem;
+  width: 100%;
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition:
+    opacity 700ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    transform 700ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.scene.on .scene-body {
+  opacity: 1;
+  transform: none;
+}
+
+/* Scenes two and four sit against the opposite edge so the eye is carried
+   across the lattice rather than down a single column. */
+.scene-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.scene-right .scene-body {
+  transform: translate3d(22px, 0, 0);
+}
+
+.scene.on.scene-right .scene-body {
+  transform: none;
+}
+
+.scene-title {
+  font-family: var(--type-display);
+  font-weight: 600;
+  font-size: clamp(1.75rem, 1.1rem + 3.6vw, 4rem);
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  color: var(--text-hi);
+  text-shadow: 0 0 40px rgba(124, 232, 255, 0.35);
+}
+
+.scene-lede {
+  font-size: clamp(0.9375rem, 0.88rem + 0.3vw, 1.125rem);
+  line-height: 1.65;
+  color: var(--text-2);
+  max-width: 34rem;
+}
+
+.scene-right .scene-lede {
+  margin-left: auto;
+}
+
+/* The scroll cue on the first screen. One element, one transform. */
+.cue {
+  position: absolute;
+  left: 50%;
+  bottom: 1.75rem;
+  z-index: 12;
+  transform: translateX(-50%);
+  color: var(--text-3);
+}
+
+.cue::after {
+  content: "";
+  display: block;
+  width: 1px;
+  height: 34px;
+  margin: 0.5rem auto 0;
+  background: linear-gradient(180deg, var(--lume), transparent);
+  transform-origin: top;
+  animation: cue-run 2.1s ease-in-out infinite;
+}
+
+@keyframes cue-run {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   MOTION. Four animations. Each one means something.
+   ========================================================================== */
+
+/* THE DEREZ. A light-cycle ribbon crosses the viewport on a route change and
+   the old page comes apart behind it.
+
+   Built so it cannot strand a reader:
+     - The overlay is fixed and pointer-events: none, always.
+     - Nothing renders until the pathname has actually changed, so a cold load
+       has no overlay in the markup at all.
+     - The ribbon's RESTING transform is off-screen and the veil's resting
+       opacity is zero, so a page at rest is never covered even if the
+       animation never runs -- which is exactly what happens under reduced
+       motion.
+     - Two elements, two compositor properties. No library, no canvas, no
+       per-frame JavaScript.
+
+   520ms: long enough to read as a cycle crossing the screen, short enough that
+   it never reads as the site being slow. */
+.derez {
   position: fixed;
   inset: 0;
   z-index: 90;
@@ -631,72 +955,72 @@
   pointer-events: none;
 }
 
-.vault-leaf {
+.derez-ribbon {
   position: absolute;
   top: -2px;
   bottom: -2px;
-  width: 50.5%;
-  background-color: #aeb4ba;
-  background-image:
-    repeating-linear-gradient(
-      94deg,
-      rgba(255, 255, 255, 0.09) 0 1px,
-      rgba(0, 0, 0, 0.07) 1px 2px,
-      transparent 2px 4px
-    ),
-    linear-gradient(176deg, rgba(255, 255, 255, 0.14), rgba(0, 0, 0, 0.13));
-  pointer-events: none;
-}
-
-.vault-leaf-left {
   left: 0;
-  transform: translate3d(-101%, 0, 0);
-  border-right: 3px solid var(--brass);
-  box-shadow:
-    inset -7px 0 0 -4px rgba(255, 255, 255, 0.5),
-    6px 0 14px rgba(20, 25, 30, 0.35);
-  animation: vault-part-left 420ms cubic-bezier(0.62, 0.02, 0.34, 1) both;
+  width: 34%;
+  min-width: 180px;
+  pointer-events: none;
+  transform: translate3d(-140%, 0, 0);
+  /* The wall the cycle leaves behind it: bright at the leading edge, falling
+     away to nothing at the tail. */
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(124, 232, 255, 0.05) 55%,
+    rgba(124, 232, 255, 0.3) 93%,
+    var(--lume-hot) 99.4%,
+    #ffffff 100%
+  );
+  box-shadow: 0 0 60px rgba(124, 232, 255, 0.55);
+  animation: derez-run 520ms cubic-bezier(0.5, 0, 0.2, 1) both;
 }
 
-.vault-leaf-right {
-  right: 0;
-  transform: translate3d(101%, 0, 0);
-  border-left: 3px solid var(--brass);
-  box-shadow:
-    inset 7px 0 0 -4px rgba(255, 255, 255, 0.5),
-    -6px 0 14px rgba(20, 25, 30, 0.35);
-  animation: vault-part-right 420ms cubic-bezier(0.62, 0.02, 0.34, 1) both;
-}
-
-@keyframes vault-part-left {
-  0% {
-    transform: translate3d(0, 0, 0);
+@keyframes derez-run {
+  from {
+    transform: translate3d(-140%, 0, 0);
   }
-  12% {
-    transform: translate3d(-1.2%, 0, 0);
+  to {
+    transform: translate3d(400%, 0, 0);
+  }
+}
+
+/* What the page derezzes into: the lattice, briefly visible over everything,
+   and gone. Opacity only. */
+.derez-veil {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-image:
+    linear-gradient(rgba(124, 232, 255, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 232, 255, 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(4, 7, 12, 0.85), rgba(4, 7, 12, 0.4));
+  background-size:
+    100% 26px,
+    26px 100%,
+    100% 100%;
+  animation: derez-flash 520ms ease-out both;
+}
+
+@keyframes derez-flash {
+  0% {
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.55;
   }
   100% {
-    transform: translate3d(-101%, 0, 0);
+    opacity: 0;
   }
 }
 
-@keyframes vault-part-right {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  12% {
-    transform: translate3d(1.2%, 0, 0);
-  }
-  100% {
-    transform: translate3d(101%, 0, 0);
-  }
-}
-
-/* A disc is turned onto its seat. Used once, where a seal is drawn. */
-@keyframes seat {
+/* A disc locks onto its spindle. Used where a seal is drawn. */
+@keyframes lock-on {
   from {
     opacity: 0;
-    transform: rotate(-9deg) scale(0.94);
+    transform: rotate(-14deg) scale(0.9);
   }
   to {
     opacity: 1;
@@ -704,16 +1028,17 @@
   }
 }
 
-.seated {
-  animation: seat 460ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+.lock {
+  animation: lock-on 520ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
-/* A part settles into the fixture. The stagger is set inline per row so a page
-   of forty does not animate as one block. */
-@keyframes settle-in {
+/* A program rezzes in: it arrives from below with its edge lit first. The
+   stagger is set inline per row and CAPPED there, so a 300-row table finishes
+   arriving in well under a second rather than in thirty. */
+@keyframes rez-in {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translate3d(0, 8px, 0) scaleY(0.965);
   }
   to {
     opacity: 1;
@@ -721,149 +1046,95 @@
   }
 }
 
-.settling {
-  animation: settle-in 320ms ease both;
+.rez {
+  animation: rez-in 340ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
 }
 
-/* An inspection lamp traverses the part while a check is actually running. */
-@keyframes traverse {
+/* A beam traverses a panel while a check is actually running. */
+@keyframes scan-run {
   from {
     transform: translateX(-110%);
   }
   to {
-    transform: translateX(210%);
+    transform: translateX(240%);
   }
 }
 
-.inspecting::after {
+.scanning::after {
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
-  width: 42%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
-  animation: traverse 1.15s ease-in-out infinite;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, rgba(124, 232, 255, 0.28), transparent);
+  animation: scan-run 1.15s ease-in-out infinite;
   pointer-events: none;
 }
 
+/* An indeterminate progress beam for the route-level loading state. */
+@keyframes beam-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+.beam {
+  position: relative;
+  height: 2px;
+  overflow: hidden;
+  background: rgba(124, 232, 255, 0.12);
+}
+
+.beam::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 34%;
+  background: linear-gradient(90deg, transparent, var(--lume-hot), transparent);
+  animation: beam-sweep 1.25s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .vault-leaf-left,
-  .vault-leaf-right,
-  .seated,
-  .settling {
+  /* Motion goes to near-zero, not to fast. Every one of these is decoration
+     over content that is already there, so removing the animation removes
+     nothing a reader needs. */
+  .derez-ribbon,
+  .derez-veil,
+  .lock,
+  .rez,
+  .cue::after {
     animation: none;
   }
 
-  .inspecting::after {
+  .derez-ribbon,
+  .derez-veil {
+    display: none;
+  }
+
+  .scene-body,
+  .scene-right .scene-body {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .scanning::after,
+  .beam::after {
     animation: none;
-    opacity: 0.35;
-  }
-}
-
-/* Legend swatches for the wheel pack. Same three inks as the drawing. */
-@layer components {
-  .wp-swatch {
-    display: inline-block;
-    width: 1.4rem;
-    height: 0.5rem;
-    border-radius: 1px;
-    vertical-align: -0.05rem;
-    margin-right: 0.15rem;
-    border: 1px solid rgba(0, 0, 0, 0.35);
+    opacity: 0.4;
   }
 
-  .wp-gate {
-    background: var(--brass-lit);
-  }
-
-  .wp-sibling {
-    background: var(--brass);
-    opacity: 0.6;
-  }
-
-  .wp-promoted {
-    background: var(--oxide-fill);
-  }
-}
-
-/* Tree nodes in the Merkle listing: small milled chips, one per node. */
-@layer components {
-  .node {
-    display: inline-block;
-    font-family: var(--type-data);
-    font-size: 0.625rem;
-    line-height: 1.4;
-    padding: 0.15rem 0.35rem;
-    border-radius: 1px;
-    border: 1px solid rgba(45, 52, 58, 0.28);
-    background: rgba(255, 255, 255, 0.16);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
-    overflow-wrap: anywhere;
-  }
-
-  .node-root {
-    border-color: rgba(50, 37, 8, 0.5);
-    background: var(--brass);
-    color: #191203;
-  }
-
-  .node-promoted {
-    border-color: rgba(50, 15, 6, 0.5);
-    background: var(--oxide-fill);
-    color: #ffdccd;
-  }
-
-  .node-more {
-    border-style: dashed;
-    background: transparent;
-    color: var(--ink-3);
-  }
-}
-
-/* The bench gauge, between the two discs, and an uncut blank. */
-@layer components {
-  .gauge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.1rem;
-    height: 2.1rem;
-    border-radius: 50%;
-    font-family: var(--type-plate);
-    font-size: 1.25rem;
-    font-weight: 600;
-    background: var(--cut);
-    box-shadow:
-      inset 0 2px 3px rgba(0, 0, 0, 0.55),
-      0 1px 0 rgba(255, 255, 255, 0.4);
-  }
-
-  .gauge-idle {
-    color: #7d868f;
-  }
-
-  .gauge-same {
-    color: var(--brass-lit);
-  }
-
-  .gauge-void {
-    color: var(--oxide-lit);
-  }
-
-  .blank {
-    border-radius: 50%;
-    background: #b6bbc1;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    box-shadow:
-      inset 0 2px 4px rgba(0, 0, 0, 0.25),
-      0 1px 0 rgba(255, 255, 255, 0.4);
-    color: var(--ink-3);
+  .rail-link::after {
+    transition: none;
   }
 }
 
 /* ==========================================================================
    RESPONSIVE LAYER
    ==========================================================================
-   The machine was drawn for one width. This section makes it a continuous
+   The Grid was drawn for one width. This section makes it a continuous
    function of the viewport instead of a ladder of breakpoints: clamp() and
    auto-fit, so the layout is considered at 361px and 917px and not only at the
    four widths somebody happened to test.
@@ -879,13 +1150,13 @@
 
    The existing @media (max-width: 900px) rule for .seam is still the only
    query at that width. Rather than adding a second one, the two layouts that
-   use .seam now switch to a row at min-[901px] so the divider flips from a
-   right edge to a bottom edge at the same moment the parts stop sitting side
-   by side.
+   use .seam switch to a row at min-[901px] so the divider flips from a right
+   edge to a bottom edge at the same moment the parts stop sitting side by
+   side.
    ========================================================================== */
 
 /* 1. The document does not scroll sideways. Designated containers -- .scrollx,
-      .trough, the nav strip -- still do. */
+      .term, the nav strip -- still do. */
 html,
 body {
   overflow-x: clip;
@@ -901,8 +1172,8 @@ body {
 /* 3. THE PAGE GUTTER. Was a fixed px-6 (1.5rem), which spends 8% of a 360px
       screen on nothing. Now 4vw between a 14px floor and the original 24px, so
       the gutter is the same on a laptop and gives back 20px on a phone.
-      .faceplate-inner takes the identical padding-inline so the plant name on
-      the rail lines up with the first character of the page under it. */
+      .rail-inner takes the identical padding-inline so the system name on the
+      rail lines up with the first character of the page under it. */
 .page {
   max-width: 1500px;
   margin-inline: auto;
@@ -910,7 +1181,7 @@ body {
   padding-block: clamp(1rem, 2.6vw, 1.75rem);
 }
 
-.faceplate-inner {
+.rail-inner {
   padding-inline: clamp(0.875rem, 4vw, 1.5rem);
 }
 
@@ -921,13 +1192,13 @@ body {
 }
 
 /* 5. Panel padding. Was a fixed 1.15rem/1.25rem; at 360px that is 40px of the
-      viewport spent on the inside of a bevel. */
-.plate {
-  padding: clamp(0.7rem, 2.2vw, 1.15rem) clamp(0.7rem, 2.6vw, 1.25rem);
+      viewport spent on the inside of an edge. */
+.panel {
+  padding: clamp(0.75rem, 2.2vw, 1.15rem) clamp(0.75rem, 2.6vw, 1.25rem);
 }
 
-/* 6. THE SIGNATURE ELEMENTS. The wheel pack already draws at width:100% with a
-      viewBox and a max-width, which is the correct pattern. The milled disc
+/* 6. THE SIGNATURE ELEMENTS. The rings already draw at width:100% with a
+      viewBox and a max-width, which is the correct pattern. The identity disc
       carried fixed width/height attributes, so it could not give way if its
       column ever got narrower than the part. It now scales with its container
       and keeps its aspect ratio from the viewBox. Neither one can force the
@@ -955,7 +1226,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
 }
 
-/* Two panels of prose or dimension rows. 2 up from ~760px rather than 1024. */
+/* Two panels of prose or readout rows. 2 up from ~760px rather than 1024. */
 .pair-grid {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
 }
@@ -967,20 +1238,20 @@ body {
 }
 
 /* 8. THE NAV. Ten section names wrapped into three or four rails pushes the
-      first screen of content below the fold. Below the threshold the index
-      marks become one horizontally scrolling strip on its own rail, with the
-      plant name and the simulated-money tag on the rail above it. The tag is
+      first screen of content below the fold. Below the threshold the section
+      links become one horizontally scrolling strip on its own rail, with the
+      system name and the simulated-money tag on the rail above it. The tag is
       not an ornament -- it is the standing disclaimer that no live money is
       reachable -- so it is kept and set smaller rather than hidden.
 
       WHY 1280px AND NOT 720px. Measured against the type rather than guessed:
-      the ten marks need about 840px at 0.75rem with 0.14em tracking and a
-      1.4rem gap, the plant name about 170px and the tag about 210px, so one
-      shared rail needs a viewport of roughly 1290px. Below that the flex
+      the ten links need about 840px at 0.75rem with 0.14em tracking and a
+      1.4rem gap, the system name about 190px and the tag about 210px, so one
+      shared rail needs a viewport of roughly 1310px. Below that the flex
       container was wrapping the header into three rails at 1024px and four at
       768px -- the whole first screen pushed down on exactly the widths this
-      pass is about. The strip therefore starts at 1280px, which is where the
-      estimate says the single rail actually runs out, and it comfortably
+      section is about. The strip therefore starts at 1280px, which is where
+      the estimate says the single rail actually runs out, and it comfortably
       contains the 720px the requirement asks for.
 
       That estimate is an advance-width model, not a measurement in a browser,
@@ -989,11 +1260,11 @@ body {
       two-rail header there rather than a one-rail one, which is a different
       composition and not a broken one.
 
-      The marks do not actually scroll until about 890px, because
+      The links do not actually scroll until about 890px, because
       overflow-x: auto only produces a scroller when there is something to
       scroll -- so a tablet gets one tidy rail of ten names, and a phone gets
       the strip. */
-.faceplate-nav {
+.rail-nav {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem 1.25rem;
@@ -1001,12 +1272,12 @@ body {
 }
 
 @media (max-width: 1280px) {
-  .faceplate-inner {
+  .rail-inner {
     gap: 0.3rem 0.75rem;
     padding-bottom: 0.4rem;
   }
 
-  .faceplate-nav {
+  .rail-nav {
     order: 3;
     /* 100% basis in a wrapping flex row is what puts the strip on its own line. */
     flex: 1 0 100%;
@@ -1020,24 +1291,24 @@ body {
     padding-bottom: 2px;
   }
 
-  .faceplate-nav::-webkit-scrollbar {
+  .rail-nav::-webkit-scrollbar {
     width: 0;
     height: 0;
     display: none;
   }
 
-  .faceplate-nav > a {
+  .rail-nav > a {
     flex: 0 0 auto;
     white-space: nowrap;
   }
 }
 
 @media (max-width: 560px) {
-  .faceplate-mark {
+  .rail-mark {
     letter-spacing: 0.12em;
   }
 
-  .faceplate-inner > .tag {
+  .rail-inner > .tag {
     font-size: 0.5625rem;
     letter-spacing: 0.06em;
     padding: 0.2rem 0.45rem;
@@ -1087,6 +1358,8 @@ body {
   .faceplate-nav,
   .frieze-inner,
   .rail,
+  .rail-inner,
+  .rail-nav,
   .navsheets,
   .masthead-nav {
     flex-wrap: nowrap;
@@ -1103,6 +1376,8 @@ body {
   .faceplate-nav::-webkit-scrollbar,
   .frieze-inner::-webkit-scrollbar,
   .rail::-webkit-scrollbar,
+  .rail-inner::-webkit-scrollbar,
+  .rail-nav::-webkit-scrollbar,
   .navsheets::-webkit-scrollbar,
   .masthead-nav::-webkit-scrollbar {
     display: none;
@@ -1118,6 +1393,8 @@ body {
   .faceplate-nav > *,
   .frieze-inner > *,
   .rail > *,
+  .rail-inner > *,
+  .rail-nav > *,
   .navsheets > * {
     flex: none;
   }
@@ -1125,7 +1402,8 @@ body {
   .nav-strip nav,
   .faceplate-inner nav,
   .frieze-inner nav,
-  .rail nav {
+  .rail nav,
+  .rail-inner nav {
     flex-wrap: nowrap;
   }
 }
@@ -1171,6 +1449,9 @@ body {
   .plate-title,
   .sheet-title,
   .panel-title,
+  .scene-kicker,
+  .rail-mark,
+  .rail-link,
   th {
     font-size: 0.6875rem;
     letter-spacing: 0.1em;
@@ -1188,6 +1469,7 @@ body {
      single max-width media query, so nothing above 1023px is affected. */
   .hash, .mono,
   .tag, .node, th,
+  .term, .ring-legend,
   [class*="text-[10px]"],
   [class*="text-[0.65rem]"],
   [class*="text-[0.625rem]"],

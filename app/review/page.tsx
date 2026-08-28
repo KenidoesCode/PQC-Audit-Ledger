@@ -4,7 +4,7 @@ import { desc, eq } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { ensureBootstrapped } from "@/db/bootstrap";
 import { agentActions, humanReviews } from "@/db/schema";
-import { Plate, Tag, inr } from "@/ui/plate";
+import { Panel, Tag, inr } from "@/ui/panel";
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +34,7 @@ export default async function ReviewPage() {
     <div className="space-y-5">
       <div className="min-w-0">
         <p className="label">Human review</p>
-        <h1 className="h-part mt-1">{pending.length} actions the system would not take alone</h1>
+        <h1 className="title mt-1">{pending.length} actions the system would not take alone</h1>
         <p className="lede mt-2 max-w-3xl">
           These are not denials. The authority covers them; the policy escalated because of the amount, or
           because the agent was not confident enough about what it had been asked to do. An escalation and a
@@ -42,7 +42,7 @@ export default async function ReviewPage() {
         </p>
       </div>
 
-      <Plate title="Queue">
+      <Panel title="Queue">
         {pending.length === 0 ? (
           <p className="text-sm">Nothing is waiting on a person.</p>
         ) : (
@@ -62,7 +62,7 @@ export default async function ReviewPage() {
                   return (
                     <tr
                       key={action.id}
-                      className="settling"
+                      className="rez"
                       style={{ animationDelay: Math.min(i, 20) * 22 + "ms" }}
                     >
                       <td>{inr(action.amountMinor)}</td>
@@ -70,7 +70,7 @@ export default async function ReviewPage() {
                       <td className="max-w-[34rem] t-2">{action.decisionReasons.join(" ")}</td>
                       <td>
                         {review ? (
-                          <span className={review.outcome === "OVERRIDDEN" ? "t-brass" : ""}>
+                          <span className={review.outcome === "OVERRIDDEN" ? "t-lume" : ""}>
                             {review.outcome}
                           </span>
                         ) : (
@@ -84,9 +84,9 @@ export default async function ReviewPage() {
             </table>
           </div>
         )}
-      </Plate>
+      </Panel>
 
-      <Plate title="What an override does to the record">
+      <Panel title="What an override does to the record">
         <div className="max-w-4xl space-y-3 text-sm">
           <p>
             An override appends a HUMAN_REVIEW receipt and, if the action then proceeds, the ordinary payment
@@ -106,7 +106,7 @@ export default async function ReviewPage() {
             </Link>
           </div>
         </div>
-      </Plate>
+      </Panel>
     </div>
   );
 }

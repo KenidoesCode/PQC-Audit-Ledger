@@ -3,7 +3,7 @@ import { desc } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { ensureBootstrapped } from "@/db/bootstrap";
 import { evaluationRuns } from "@/db/schema";
-import { Dim, Figure, Plate, Tag } from "@/ui/plate";
+import { Dim, Figure, Panel, Tag } from "@/ui/panel";
 import type { EvaluationResult } from "@/evaluation/evaluate";
 
 export const dynamic = "force-dynamic";
@@ -18,9 +18,9 @@ export default async function EvaluationPage() {
 
   if (!m) {
     return (
-      <Plate title="Evaluation">
+      <Panel title="Evaluation">
         <p className="text-sm">No evaluation has been run.</p>
-      </Plate>
+      </Panel>
     );
   }
 
@@ -31,7 +31,7 @@ export default async function EvaluationPage() {
     <div className="space-y-5">
       <div className="min-w-0">
         <p className="label">Cryptographic evaluation</p>
-        <h1 className="h-part mt-1">
+        <h1 className="title mt-1">
           {m.receiptCount} receipts, {m.mutationCount} applied mutations, {m.controlCount} controls
         </h1>
         <p className="mono mt-1 t-2">
@@ -42,7 +42,7 @@ export default async function EvaluationPage() {
       {/* ------------------------------------------------------------------ */}
       {/* The honest reading comes FIRST, above the numbers it is about.     */}
       {/* ------------------------------------------------------------------ */}
-      <Plate title="Read this before the numbers">
+      <Panel title="Read this before the numbers">
         <div className="max-w-4xl space-y-3 text-sm">
           <p>
             <strong>
@@ -82,16 +82,16 @@ export default async function EvaluationPage() {
             as an undetected tamper would quietly lower the denominator in our favour.
           </p>
         </div>
-      </Plate>
+      </Panel>
 
       <div className="card-grid">
-        <Plate>
+        <Panel>
           <Figure value={(m.tamperDetectionRate * 100).toFixed(1) + "%"} caption="tamper detection" />
           <p className="mt-2 text-xs t-2">
             {m.tamperDetected} of {m.mutationCount} rejected · {m.tamperMissed} missed
           </p>
-        </Plate>
-        <Plate>
+        </Panel>
+        <Panel>
           <Figure
             value={(m.falseVerificationRate * 100).toFixed(1) + "%"}
             caption="false verification"
@@ -100,12 +100,12 @@ export default async function EvaluationPage() {
           <p className="mt-2 text-xs t-2">
             {m.falseVerifications} of {m.controlCount} controls wrongly rejected
           </p>
-        </Plate>
-        <Plate>
+        </Panel>
+        <Panel>
           <Figure value={(m.auditCompleteness * 100).toFixed(1) + "%"} caption="audit completeness" />
           <p className="mt-2 text-xs t-2">measured against the actions table, not the receipts table</p>
-        </Plate>
-        <Plate>
+        </Panel>
+        <Panel>
           <Figure
             value={m.chainIntact ? "intact" : "broken"}
             caption="hash chain"
@@ -114,11 +114,11 @@ export default async function EvaluationPage() {
           <p className="mt-2 text-xs t-2">
             {m.chainBrokenLinks} broken links · {m.chainMissingSequences} missing sequences
           </p>
-        </Plate>
+        </Panel>
       </div>
 
       <div className="pair-grid">
-        <Plate title="Per mutation type">
+        <Panel title="Per mutation type">
           <div className="scrollx">
             <table className="register">
               <thead>
@@ -153,10 +153,10 @@ export default async function EvaluationPage() {
               receipt here. They are counted as untested, not as passed.
             </p>
           )}
-        </Plate>
+        </Panel>
 
         <div className="space-y-5">
-          <Plate title="Latency">
+          <Panel title="Latency">
             <div className="scrollx">
               <table className="register">
                 <thead>
@@ -195,9 +195,9 @@ export default async function EvaluationPage() {
               3309 bytes against Ed25519&apos;s 64 — roughly fifty times the storage per receipt, which is the
               price of the post-quantum property and is paid in disk, not in latency.
             </p>
-          </Plate>
+          </Panel>
 
-          <Plate title="Anchoring">
+          <Panel title="Anchoring">
             <div className="space-y-1.5">
               <Dim label="Merkle proofs checked" value={m.merkleProofsChecked + " (sampled)"} />
               <Dim label="Merkle proofs valid" value={String(m.merkleProofsValid)} />
@@ -208,12 +208,12 @@ export default async function EvaluationPage() {
               Proofs are checked on a sample, not on every receipt — rebuilding the tree per receipt is
               quadratic. The sample size is printed so nobody reads this as every proof having been checked.
             </p>
-          </Plate>
+          </Panel>
         </div>
       </div>
 
       {m.columnBodyDivergences.length > 0 && (
-        <Plate title="Column and body disagree">
+        <Panel title="Column and body disagree">
           <div className="scrollx">
             <table className="register">
               <thead>
@@ -242,10 +242,10 @@ export default async function EvaluationPage() {
               evaluation run stored at <code className="mono">/api/evaluate</code>.
             </p>
           )}
-        </Plate>
+        </Panel>
       )}
 
-      <Plate title="Previous runs">
+      <Panel title="Previous runs">
         <div className="scrollx">
           <table className="register">
             <thead>
@@ -278,7 +278,7 @@ export default async function EvaluationPage() {
         <div className="mt-4">
           <Tag kind="note">POST /api/evaluate to run another</Tag>
         </div>
-      </Plate>
+      </Panel>
     </div>
   );
 }

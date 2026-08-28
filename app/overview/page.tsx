@@ -7,8 +7,8 @@ import { agentActions, auditReceipts, evaluationRuns, merkleBatches, payments } 
 import { listPublicKeys } from "@/crypto/keys";
 import { verifyChain, unanchoredCount } from "@/audit/ledger";
 import { SUITE } from "@/crypto/mldsa";
-import { Dim, Figure, Hash, Plate, Tag, inr } from "@/ui/plate";
-import { MilledDisc } from "@/ui/disc";
+import { Dim, Figure, Hash, Panel, Tag, inr } from "@/ui/panel";
+import { IdentityDisc } from "@/ui/disc";
 import type { EvaluationResult } from "@/evaluation/evaluate";
 
 export const dynamic = "force-dynamic";
@@ -46,11 +46,11 @@ export default async function OverviewPage() {
       {/* The head of the machine: the seal on the left, the claim on the    */}
       {/* right, jointed along a machined seam.                              */}
       {/* ------------------------------------------------------------------ */}
-      <section className="plate">
+      <section className="panel">
         <div className="flex flex-col gap-6 min-[901px]:flex-row min-[901px]:items-start">
           <div className="seam flex shrink-0 flex-col items-center">
             {genesis ? (
-              <MilledDisc hash={genesis.payloadHash} size={152} className="seated" />
+              <IdentityDisc hash={genesis.payloadHash} size={152} className="lock" />
             ) : (
               <div className="h-[152px] w-[152px]" />
             )}
@@ -60,7 +60,7 @@ export default async function OverviewPage() {
 
           <div className="min-w-0 flex-1">
             <p className="label">Post-quantum signed, tamper-evident audit ledger</p>
-            <h1 className="h-part mt-1.5">
+            <h1 className="title mt-1.5">
               Every agent action on this system carries a receipt a stranger can check.
             </h1>
             <p className="lede mt-3 max-w-3xl">
@@ -96,7 +96,7 @@ export default async function OverviewPage() {
       {/* Taking the evidence away is the point of the project, so it gets   */}
       {/* the only brass-faced controls on the site.                          */}
       {/* ------------------------------------------------------------------ */}
-      <Plate title="Take the evidence with you">
+      <Panel title="Take the evidence with you">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <p className="lede max-w-2xl">
             The bundle is every receipt, every signature and every Merkle root as one file. The verifier is one
@@ -104,18 +104,18 @@ export default async function OverviewPage() {
             is the only reason a stranger has to believe either of them.
           </p>
           <div className="flex flex-wrap gap-3">
-            <a href="/api/bundle" className="key key-brass">
+            <a href="/api/bundle" className="key key-lume">
               Download audit bundle
             </a>
-            <a href="/ledger-verify.mjs" download className="key key-brass">
+            <a href="/ledger-verify.mjs" download className="key key-lume">
               Download offline verifier
             </a>
           </div>
         </div>
-      </Plate>
+      </Panel>
 
       <div className="card-grid">
-        <Plate title="Decisions">
+        <Panel title="Decisions">
           <div className="space-y-3">
             <Dim ruled label="Allowed" value={String(actions.length - denied.length - review.length)} />
             <Dim ruled label="Denied" value={String(denied.length)} tone={denied.length > 0 ? "void" : undefined} />
@@ -127,9 +127,9 @@ export default async function OverviewPage() {
             A denial writes more receipts than an approval, not fewer. A system that only records what it did
             cannot answer what it refused to do.
           </p>
-        </Plate>
+        </Panel>
 
-        <Plate title="Signing key">
+        <Panel title="Signing key">
           {keys.length === 0 ? (
             <p className="text-sm">No key.</p>
           ) : (
@@ -144,9 +144,9 @@ export default async function OverviewPage() {
               </div>
             ))
           )}
-        </Plate>
+        </Panel>
 
-        <Plate title="Merkle anchors">
+        <Panel title="Merkle anchors">
           {batches.length === 0 ? (
             <p className="text-sm">Nothing anchored yet.</p>
           ) : (
@@ -166,11 +166,11 @@ export default async function OverviewPage() {
           <Link href="/merkle" className="underlink label mt-4 inline-block">
             Open the wheel pack →
           </Link>
-        </Plate>
+        </Panel>
       </div>
 
       {metrics && (
-        <Plate
+        <Panel
           title="Latest evaluation"
           right={
             <Link href="/evaluation" className="underlink">
@@ -195,10 +195,10 @@ export default async function OverviewPage() {
             signature. The number is a regression test on the canonicalizer. The evaluation page says what the
             signature does <em>not</em> cover.
           </p>
-        </Plate>
+        </Panel>
       )}
 
-      <Plate
+      <Panel
         title="Latest receipts"
         right={
           <Link href="/receipts" className="underlink">
@@ -219,7 +219,7 @@ export default async function OverviewPage() {
             </thead>
             <tbody>
               {receipts.map((receipt, i) => (
-                <tr key={receipt.id} className="settling" style={{ animationDelay: i * 28 + "ms" }}>
+                <tr key={receipt.id} className="rez" style={{ animationDelay: i * 28 + "ms" }}>
                   <td className="t-3">{receipt.sequence}</td>
                   <td>
                     <Link href={"/receipts/" + receipt.id} className="underlink">
@@ -241,7 +241,7 @@ export default async function OverviewPage() {
         <p className="mt-3 text-xs t-3">
           The eight most recent of {receiptTotal?.value ?? 0}, newest first.
         </p>
-      </Plate>
+      </Panel>
     </div>
   );
 }

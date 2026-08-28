@@ -5,7 +5,7 @@ import { getDb } from "@/db/client";
 import { ensureBootstrapped } from "@/db/bootstrap";
 import { auditReceipts, merkleLeaves } from "@/db/schema";
 import { verifyChain } from "@/audit/ledger";
-import { Hash, Plate, Tag } from "@/ui/plate";
+import { Hash, Panel, Tag } from "@/ui/panel";
 
 export const dynamic = "force-dynamic";
 
@@ -62,7 +62,7 @@ export default async function ReceiptsPage({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <p className="label">Append-only audit ledger</p>
-          <h1 className="h-part mt-1">{total} receipts, oldest first</h1>
+          <h1 className="title mt-1">{total} receipts, oldest first</h1>
           <p className="lede mt-2 max-w-2xl">
             Each row names the payload hash of the row above it. Remove one and every row below it stops
             linking. That is the only thing protecting the set; a signature protects one receipt, and nothing
@@ -77,7 +77,7 @@ export default async function ReceiptsPage({
         </div>
       </div>
 
-      <Plate>
+      <Panel>
         <div className="scrollx">
           <table className="register">
             <thead>
@@ -94,7 +94,7 @@ export default async function ReceiptsPage({
               {rows.map((row, i) => (
                 <tr
                   key={row.id}
-                  className="settling"
+                  className="rez"
                   // The stagger is only worth its bytes on the rows a reader
                   // actually sees arrive; the rest settle together.
                   style={i < 12 ? { animationDelay: i * 22 + "ms" } : undefined}
@@ -113,7 +113,7 @@ export default async function ReceiptsPage({
                   </td>
                   <td>
                     {anchored.has(row.id) ? (
-                      <span className="t-brass">yes</span>
+                      <span className="t-lume">yes</span>
                     ) : (
                       <span className="t-3">pending</span>
                     )}
@@ -144,7 +144,7 @@ export default async function ReceiptsPage({
             later →
           </Link>
         </div>
-      </Plate>
+      </Panel>
     </div>
   );
 }

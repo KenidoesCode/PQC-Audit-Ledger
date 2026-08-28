@@ -68,7 +68,7 @@ export function DemoRunner() {
             onClick={() => void run(scenario.id)}
             disabled={running !== null}
             className={
-              "key " + (running === scenario.id ? "inspecting relative overflow-hidden" : "")
+              "key " + (running === scenario.id ? "scanning relative overflow-hidden" : "")
             }
           >
             {scenario.label}
@@ -91,10 +91,10 @@ export function DemoRunner() {
             {result.steps.map((step, i) => (
               <li
                 key={step.step}
-                className="settling grid gap-1 border-l-2 pl-3 sm:grid-cols-[13rem_1fr]"
+                className="rez grid gap-1 border-l-2 pl-3 sm:grid-cols-[13rem_1fr]"
                 style={{
                   animationDelay: i * 70 + "ms",
-                  borderColor: step.ok ? "var(--brass)" : "var(--oxide-fill)",
+                  borderColor: step.ok ? "var(--lume)" : "var(--clu)",
                 }}
               >
                 <div>

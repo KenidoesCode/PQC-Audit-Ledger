@@ -6,8 +6,8 @@ import { ensureBootstrapped } from "@/db/bootstrap";
 import { merkleBatches, merkleLeaves } from "@/db/schema";
 import { buildLevels, buildProof, verifyProof } from "@/crypto/merkle";
 import { unanchoredCount } from "@/audit/ledger";
-import { Dim, Hash, Plate, Tag } from "@/ui/plate";
-import { WheelPack } from "@/ui/wheel-pack";
+import { Dim, Hash, Panel, Tag } from "@/ui/panel";
+import { MerkleRings } from "@/ui/rings";
 
 export const dynamic = "force-dynamic";
 
@@ -45,11 +45,11 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
 
   if (!selected) {
     return (
-      <Plate title="Merkle ledger">
+      <Panel title="Merkle ledger">
         <p className="text-sm">
           No batch has been sealed. {unanchored} receipts are signed and chained but not yet anchored.
         </p>
-      </Plate>
+      </Panel>
     );
   }
 
@@ -79,7 +79,7 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="min-w-0">
           <p className="label">Merkle anchoring</p>
-          <h1 className="h-part mt-1">
+          <h1 className="title mt-1">
             Batch of {selected.treeSize}, sequences {selected.fromSequence}–{selected.toSequence}
           </h1>
           <p className="lede mt-2 max-w-3xl">
@@ -94,9 +94,9 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <Plate title="The wheel pack">
+        <Panel title="The wheel pack">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:items-start">
-            <WheelPack levels={levels} proofIndex={sampleIndex} />
+            <MerkleRings levels={levels} proofIndex={sampleIndex} />
 
             <div className="min-w-0 space-y-4">
               {[...levels].reverse().map((level, reversedIndex) => {
@@ -157,10 +157,10 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
             The listing prints the first {NODES_SHOWN} nodes of each level and says how many it left out. The
             complete tree is in the audit bundle and at <code className="mono">/api/merkle/proof</code>.
           </p>
-        </Plate>
+        </Panel>
 
         <div className="space-y-5">
-          <Plate title="Root">
+          <Panel title="Root">
             <p className="hash">{selected.root}</p>
             <div className="mt-3 space-y-1.5">
               <Dim label="Algorithm" value={selected.algorithm} />
@@ -169,10 +169,10 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
               <Dim label="Rebuilds" value={rootMatches ? "yes" : "NO"} tone={rootMatches ? undefined : "void"} />
               <Dim label="Unanchored" value={String(unanchored)} />
             </div>
-          </Plate>
+          </Panel>
 
           {sampleProof && sampleCheck && (
-            <Plate title="A proof, checked here">
+            <Panel title="A proof, checked here">
               <p className="text-xs t-2">Leaf 0, folded {sampleProof.siblings.length} times.</p>
               <ol className="mt-2 space-y-1">
                 {sampleProof.siblings.map((sibling, i) => (
@@ -192,10 +192,10 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
                 <code className="mono">/api/merkle/proof/&lt;receiptId&gt;</code> and check it yourself with the
                 offline verifier.
               </p>
-            </Plate>
+            </Panel>
           )}
 
-          <Plate title="Batches">
+          <Panel title="Batches">
             <ul className="space-y-1.5">
               {batches.map((batch) => (
                 <li key={batch.id} className="min-w-0">
@@ -208,11 +208,11 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
                 </li>
               ))}
             </ul>
-          </Plate>
+          </Panel>
         </div>
       </div>
 
-      <Plate title="Leaves in this batch">
+      <Panel title="Leaves in this batch">
         <div className="scrollx">
           <table className="register">
             <thead>
@@ -252,7 +252,7 @@ export default async function MerklePage({ searchParams }: { searchParams: Promi
               leaves.length +
               ", in ledger order. Every leaf is in the audit bundle; none of them is omitted from the root."}
         </p>
-      </Plate>
+      </Panel>
     </div>
   );
 }

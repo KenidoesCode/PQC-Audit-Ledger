@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { CRITICAL_FIELDS } from "@/audit/receipt";
-import { MilledDisc } from "./disc";
+import { IdentityDisc } from "./disc";
 
 /**
  * The tamper bench.
@@ -131,7 +131,7 @@ export function TamperPanel({
       <div className="grid gap-5 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-start">
         <div className="flex flex-wrap items-start justify-center gap-4">
           <div className="text-center">
-            <MilledDisc hash={originalHash} size={128} />
+            <IdentityDisc hash={originalHash} size={128} />
             <p className="label mt-1">as stored</p>
             <p className="hash">{originalHash.slice(0, 12)}</p>
           </div>
@@ -145,12 +145,12 @@ export function TamperPanel({
           <div className="text-center">
             {computed ? (
               <>
-                <MilledDisc
+                <IdentityDisc
                   key={computed}
                   hash={computed}
                   size={128}
-                  tone={changed ? "oxide" : "brass"}
-                  className="seated"
+                  tone={changed ? "clu" : "lume"}
+                  className="lock"
                 />
                 <p className="label mt-1">{changed ? "after your edit" : "recomputed"}</p>
                 <p className={"hash " + (changed ? "t-void" : "")}>{computed.slice(0, 12)}</p>
@@ -166,7 +166,7 @@ export function TamperPanel({
           </div>
         </div>
 
-        <div className={"relative min-w-0 overflow-hidden " + (busy ? "inspecting" : "")}>
+        <div className={"relative min-w-0 overflow-hidden " + (busy ? "scanning" : "")}>
           {response ? (
             <>
               <div className="mb-3 flex flex-wrap items-center gap-3">
@@ -186,7 +186,7 @@ export function TamperPanel({
               <ul className="space-y-1.5">
                 {response.result.checks.map((check) => (
                   <li key={check.name} className="flex min-w-0 gap-2 text-xs leading-snug">
-                    <span className={"mono shrink-0 " + (check.passed ? "t-brass" : "t-void")}>
+                    <span className={"mono shrink-0 " + (check.passed ? "t-lume" : "t-void")}>
                       {check.passed ? "ok  " : "FAIL"}
                     </span>
                     <span className="min-w-0">

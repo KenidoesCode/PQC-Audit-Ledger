@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
-import { Faceplate } from "@/ui/faceplate";
-import { VaultDoor } from "@/ui/vault-door";
+import { Derez } from "@/ui/derez";
+import { Shell } from "@/ui/shell";
 
 export const metadata: Metadata = {
   title: "PQC Audit Ledger",
@@ -14,9 +14,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <Faceplate />
-        <VaultDoor />
-        <main className="page">{children}</main>
+        <Derez />
+        <Shell>{children}</Shell>
       </body>
     </html>
   );

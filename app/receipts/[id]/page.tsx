@@ -7,8 +7,8 @@ import { ensureBootstrapped } from "@/db/bootstrap";
 import { auditReceipts } from "@/db/schema";
 import { verifyStoredReceipt } from "@/verify/service";
 import { receiptCanonicalString, type ReceiptBody } from "@/audit/receipt";
-import { Dim, Hash, Plate, Tag } from "@/ui/plate";
-import { MilledDisc } from "@/ui/disc";
+import { Dim, Hash, Panel, Tag } from "@/ui/panel";
+import { IdentityDisc } from "@/ui/disc";
 import { TamperPanel } from "@/ui/tamper-panel";
 
 export const dynamic = "force-dynamic";
@@ -47,14 +47,14 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
       </Link>
 
       {/* The part itself: seal on the left, the record on the right. */}
-      <section className="plate">
+      <section className="panel">
         <div className="flex flex-col gap-6 min-[901px]:flex-row">
           <div className="seam flex shrink-0 flex-col items-center min-[901px]:w-[210px]">
-            <MilledDisc
+            <IdentityDisc
               hash={row.payloadHash}
               size={168}
-              tone={record.result.valid ? "brass" : "oxide"}
-              className="seated"
+              tone={record.result.valid ? "lume" : "clu"}
+              className="lock"
             />
             <p className="label mt-2">Receipt no. {row.sequence}</p>
             <p className="hash mt-1 text-center">{row.payloadHash}</p>
@@ -73,7 +73,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
           <div className="min-w-0 flex-1 space-y-4">
             <div className="min-w-0">
               <p className="label">{body.eventType}</p>
-              <h1 className="h-part mt-1">{describe(body)}</h1>
+              <h1 className="title mt-1">{describe(body)}</h1>
               <p className="mono mt-1 t-2">{row.id}</p>
             </div>
 
@@ -95,7 +95,7 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
       </section>
 
       <div className="pair-grid">
-        <Plate title="What this receipt binds">
+        <Panel title="What this receipt binds">
           <dl className="space-y-1.5">
             {Object.entries(body.references).map(([key, value]) => (
               <div key={key} className="dim">
@@ -111,34 +111,34 @@ export default async function ReceiptPage({ params }: { params: Promise<{ id: st
             two canonicalize differently, so which of them a writer produced must never depend on how the
             object happened to be built.
           </p>
-        </Plate>
+        </Panel>
 
-        <Plate title="Event">
-          <pre className="trough trough-wrap max-h-[22rem] overflow-auto">
+        <Panel title="Event">
+          <pre className="term term-wrap max-h-[22rem] overflow-auto">
             {JSON.stringify(body.event, null, 2)}
           </pre>
-        </Plate>
+        </Panel>
       </div>
 
-      <Plate title="Tamper bench">
+      <Panel title="Tamper bench">
         <TamperPanel receiptId={row.id} originalHash={row.payloadHash} fieldValues={fieldValues} />
-      </Plate>
+      </Panel>
 
-      <Plate title="Canonical bytes — exactly what was signed">
-        <pre className="trough trough-wrap max-h-[16rem] overflow-auto">{canonical}</pre>
+      <Panel title="Canonical bytes — exactly what was signed">
+        <pre className="term term-wrap max-h-[16rem] overflow-auto">{canonical}</pre>
         <p className="mt-3 text-xs t-2">
           Keys sorted, no whitespace, UTF-8. SHA-256 over these bytes is the payload hash; ML-DSA-65 over these
           bytes is the signature. Not over the row, not over a re-serialization: over these.
         </p>
-      </Plate>
+      </Panel>
 
-      <Plate title="Signature">
+      <Panel title="Signature">
         <p className="hash">{row.signature ?? "(unsigned)"}</p>
         <p className="mt-3 text-xs t-2">
           3309 bytes. FIPS 204 signing is hedged, so re-signing this same receipt would produce different bytes
           that also verify — which is why nothing in this system treats a signature as an identity.
         </p>
-      </Plate>
+      </Panel>
     </div>
   );
 }

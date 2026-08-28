@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /** A machined face: one part, with its name struck into a milled channel. */
-export function Plate({
+export function Panel({
   title,
   right,
   children,
@@ -13,9 +13,9 @@ export function Plate({
   className?: string;
 }) {
   return (
-    <section className={"plate " + (className ?? "")}>
+    <section className={"panel " + (className ?? "")}>
       {title && (
-        <div className="plate-title">
+        <div className="panel-title">
           <span>{title}</span>
           {right}
         </div>

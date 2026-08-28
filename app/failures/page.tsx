@@ -4,7 +4,7 @@ import { getDb } from "@/db/client";
 import { ensureBootstrapped } from "@/db/bootstrap";
 import { agentActions, payments, webhookEvents } from "@/db/schema";
 import { verifyChain } from "@/audit/ledger";
-import { Dim, Plate, inr } from "@/ui/plate";
+import { Dim, Panel, inr } from "@/ui/panel";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +29,7 @@ export default async function FailuresPage() {
     <div className="space-y-5">
       <div className="min-w-0">
         <p className="label">Failures</p>
-        <h1 className="h-part mt-1">What this system refused, and what went wrong on its own</h1>
+        <h1 className="title mt-1">What this system refused, and what went wrong on its own</h1>
         <p className="lede mt-2 max-w-3xl">
           A refusal is a result, not an error. Everything on this page has receipts behind it, signed to the
           same standard as the successes.
@@ -37,13 +37,13 @@ export default async function FailuresPage() {
       </div>
 
       <div className="pair-grid">
-        <Plate title={"Policy denials (" + denied.length + ")"}>
+        <Panel title={"Policy denials (" + denied.length + ")"}>
           {denied.length === 0 ? (
             <p className="text-sm">Nothing was denied.</p>
           ) : (
             <ul className="space-y-2.5">
               {denied.map((action) => (
-                <li key={action.id} className="min-w-0 border-l-2 border-[var(--oxide-fill)] pl-3">
+                <li key={action.id} className="min-w-0 border-l-2 border-[var(--clu)] pl-3">
                   <p className="mono">
                     {inr(action.amountMinor)} to {action.merchantId}
                   </p>
@@ -58,10 +58,10 @@ export default async function FailuresPage() {
               ))}
             </ul>
           )}
-        </Plate>
+        </Panel>
 
         <div className="space-y-5">
-          <Plate title={"Payment failures (" + failed.length + ")"}>
+          <Panel title={"Payment failures (" + failed.length + ")"}>
             {failed.length === 0 ? (
               <p className="text-sm">No payment failed.</p>
             ) : (
@@ -90,9 +90,9 @@ export default async function FailuresPage() {
               A failed payment still produces a full receipt chain. A ledger that only records successes cannot
               be used to investigate anything.
             </p>
-          </Plate>
+          </Panel>
 
-          <Plate title="Webhook anomalies">
+          <Panel title="Webhook anomalies">
             <div className="space-y-1.5">
               <Dim label="Deliveries recorded" value={String(webhooks.length)} />
               <Dim label="Duplicates" value={String(duplicates.length)} />
@@ -106,11 +106,11 @@ export default async function FailuresPage() {
               A redelivery is recorded and changes nothing. Recording it is the point: a duplicate that leaves
               no trace is indistinguishable from one that was never sent.
             </p>
-          </Plate>
+          </Panel>
         </div>
       </div>
 
-      <Plate title="Ledger integrity">
+      <Panel title="Ledger integrity">
         {chain.intact ? (
           <p className="text-sm">
             No broken links and no missing sequences across {chain.receiptCount} receipts. A break here would
@@ -146,7 +146,7 @@ export default async function FailuresPage() {
             </div>
           </div>
         )}
-      </Plate>
+      </Panel>
     </div>
   );
 }
